@@ -957,6 +957,246 @@
       background: var(--animal-primary-color);
     }
 
+    .timeline-interactive {
+      display: grid;
+      gap: 16px;
+    }
+
+    .mindmap-toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      gap: 10px;
+      align-items: center;
+      padding: 12px;
+      border: 2px dashed var(--animal-border-color);
+      border-radius: 20px;
+      background: #fffaf0;
+    }
+
+    .mindmap-toolbar > div {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .mindmap-hint {
+      color: #7c5734;
+      font-size: 12px;
+      font-weight: 900;
+    }
+
+    .mindmap-stage {
+      position: relative;
+      min-height: 460px;
+      overflow: auto;
+      border: 2px solid var(--animal-border-color);
+      border-radius: 24px;
+      background:
+        radial-gradient(circle at 20% 28%, rgba(25, 200, 185, 0.12), transparent 9rem),
+        radial-gradient(circle at 82% 72%, rgba(247, 205, 103, 0.18), transparent 8rem),
+        #faf8f2;
+      cursor: grab;
+    }
+
+    .mindmap-stage.is-dragging {
+      cursor: grabbing;
+    }
+
+    .mindmap-canvas {
+      position: relative;
+      width: 1180px;
+      height: 620px;
+      transform-origin: 0 0;
+    }
+
+    .mindmap-links {
+      position: absolute;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+      overflow: visible;
+    }
+
+    .mindmap-link {
+      fill: none;
+      stroke-width: 4;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      opacity: 0.64;
+    }
+
+    .mindmap-node {
+      position: absolute;
+      z-index: 1;
+      width: 230px;
+      min-height: 120px;
+      padding: 12px;
+      border: 2px solid rgba(114, 93, 66, 0.14);
+      border-radius: 22px;
+      color: #725d42;
+      background: #fffaf0;
+      box-shadow: var(--animal-shadow);
+      user-select: none;
+      transition: box-shadow 0.18s ease, transform 0.18s ease, border-color 0.18s ease;
+    }
+
+    .mindmap-node:hover,
+    .mindmap-node.is-selected {
+      border-color: var(--animal-primary-color);
+      box-shadow: 0 8px 0 rgba(189, 174, 160, 0.65), var(--animal-shadow-lg);
+    }
+
+    .mindmap-node.is-ending {
+      background: #fff3cd;
+    }
+
+    .mindmap-node.is-collapsed {
+      min-height: 92px;
+    }
+
+    .mindmap-node.is-collapsed .mindmap-node-body,
+    .mindmap-node.is-collapsed .mindmap-note,
+    .mindmap-node.is-collapsed .mindmap-node-actions {
+      display: none;
+    }
+
+    .mindmap-node-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 8px;
+      align-items: flex-start;
+    }
+
+    .mindmap-node-title {
+      margin: 0;
+      color: #725d42;
+      font-size: 13px;
+      line-height: 1.35;
+      font-weight: 900;
+    }
+
+    .mindmap-node-body,
+    .mindmap-note {
+      margin: 8px 0 0;
+      color: #7c5734;
+      font-size: 12px;
+      line-height: 1.55;
+      font-weight: 800;
+    }
+
+    .mindmap-note {
+      padding: 8px;
+      border-radius: 14px;
+      background: rgba(25, 200, 185, 0.10);
+    }
+
+    .mindmap-node-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 10px;
+    }
+
+    .mindmap-mini-button {
+      min-height: 28px;
+      padding: 0 9px;
+      font-size: 11px;
+      box-shadow: none;
+    }
+
+    .compare-panel {
+      display: none;
+      gap: 12px;
+      padding: 14px;
+      border: 2px solid var(--animal-border-color);
+      border-radius: 24px;
+      background: #fffaf0;
+    }
+
+    .compare-panel.is-open {
+      display: grid;
+    }
+
+    .compare-controls {
+      display: grid;
+      grid-template-columns: 1fr 1fr auto;
+      gap: 10px;
+      align-items: end;
+    }
+
+    .compare-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .compare-column {
+      padding: 12px;
+      border: 2px dashed var(--animal-border-color);
+      border-radius: 20px;
+      background: #faf8f2;
+    }
+
+    .compare-column h4 {
+      margin: 0 0 10px;
+      color: #725d42;
+      font-size: 15px;
+      font-weight: 900;
+    }
+
+    .compare-step {
+      margin: 0 0 8px;
+      padding: 8px;
+      border-radius: 14px;
+      color: #7c5734;
+      background: rgba(255, 255, 255, 0.58);
+      font-size: 12px;
+      line-height: 1.55;
+      font-weight: 800;
+    }
+
+    .compare-step.is-divergence {
+      outline: 2px solid var(--animal-warning-color);
+      background: #fff3cd;
+    }
+
+    .compare-step.is-different {
+      outline: 2px solid rgba(25, 200, 185, 0.45);
+      background: #e6f9f6;
+    }
+
+    .annotation-panel {
+      position: fixed;
+      right: 18px;
+      bottom: 18px;
+      z-index: 1300;
+      width: min(380px, calc(100vw - 36px));
+      display: none;
+      gap: 10px;
+      padding: 16px;
+      border-radius: 24px;
+      color: #725d42;
+      background: var(--animal-bg-color);
+      box-shadow: var(--animal-shadow-lg);
+    }
+
+    .annotation-panel.is-open {
+      display: grid;
+    }
+
+    .annotation-panel textarea,
+    .annotation-panel input {
+      width: 100%;
+    }
+
+    .annotation-actions {
+      display: flex;
+      gap: 8px;
+      justify-content: flex-end;
+    }
+
     .timeline.timeline-horizontal {
       overflow: auto hidden;
       padding-bottom: 12px;
@@ -1428,22 +1668,69 @@
             <div class="section-meta">
               <span class="small">同一源头，不同选择，不同后果</span>
               <div class="timeline-tools" role="group" aria-label="分支时间线布局">
+                <button type="button" class="mode-button" data-timeline-layout="map">导图</button>
                 <button type="button" class="mode-button is-active" data-timeline-layout="vertical">纵向</button>
                 <button type="button" class="mode-button" data-timeline-layout="horizontal">横向</button>
+                <button type="button" class="mode-button" id="compare-toggle">对比</button>
               </div>
             </div>
           </div>
-          <div class="timeline timeline-vertical" id="timeline">
-            <svg class="timeline-flow" id="timelineFlow" aria-hidden="true"></svg>
-            <div class="timeline-card">
-              <b>节点 1：源头事件</b>
-              <span>生成冲突后，这里会展开多条可能的结局线。</span>
+          <div class="timeline-interactive">
+            <div class="mindmap-toolbar" id="mindmap-toolbar">
+              <span class="mindmap-hint">导图模式：拖动画布查看，点击节点展开 / 折叠或添加批注。</span>
+              <div>
+                <button type="button" class="secondary mindmap-mini-button" id="mindmap-reset">重置视图</button>
+                <button type="button" class="secondary mindmap-mini-button" id="mindmap-expand">全部展开</button>
+                <button type="button" class="secondary mindmap-mini-button" id="mindmap-collapse">折叠末端</button>
+              </div>
+            </div>
+            <div class="timeline timeline-vertical" id="timeline">
+              <svg class="timeline-flow" id="timelineFlow" aria-hidden="true"></svg>
+              <div class="timeline-card">
+                <b>节点 1：源头事件</b>
+                <span>生成冲突后，这里会展开多条可能的结局线。</span>
+              </div>
+            </div>
+            <div class="compare-panel" id="compare-panel">
+              <div class="compare-controls">
+                <label>
+                  结局 A
+                  <select id="compare-a"></select>
+                </label>
+                <label>
+                  结局 B
+                  <select id="compare-b"></select>
+                </label>
+                <button type="button" id="compare-run">对比路径</button>
+              </div>
+              <div class="compare-grid" id="compare-grid"></div>
             </div>
           </div>
         </section>
       </section>
     </main>
   </div>
+
+  <aside class="annotation-panel" id="annotation-panel" aria-label="节点批注编辑" aria-hidden="true">
+    <h3 id="annotation-title">节点批注</h3>
+    <label>
+      节点标题
+      <input id="annotation-node-title">
+    </label>
+    <label>
+      节点内容
+      <textarea id="annotation-node-event"></textarea>
+    </label>
+    <label>
+      批注
+      <textarea id="annotation-note" placeholder="例如：这里可以加一个伏笔，对应后面的反转"></textarea>
+    </label>
+    <div class="annotation-actions">
+      <button type="button" class="secondary" id="annotation-close">关闭</button>
+      <button type="button" class="secondary" id="annotation-regenerate">重生成后续</button>
+      <button type="button" id="annotation-save">保存</button>
+    </div>
+  </aside>
 
   <aside class="panel history-panel" id="history-panel" aria-label="历史记录" aria-hidden="true">
     <div class="panel-header">
@@ -1615,7 +1902,14 @@
         timeline: null,
         timelineLayout: "vertical",
         timelineTicking: false,
-        inspirationPool: []
+        inspirationPool: [],
+        timelineAnnotations: {},
+        selectedNodeId: null,
+        compareMode: false,
+        mapView: { x: 0, y: 0 },
+        mapDrag: null,
+        nodeDrag: null,
+        suppressNodeClick: false
       };
 
       function $(id) {
@@ -1623,7 +1917,7 @@
       }
 
       function cacheDom() {
-        ["story-form", "imagine-start", "inspiration-bubbles", "keywords", "genre", "intensity", "hero", "focus", "seedIdea", "generate", "randomize", "clear", "copy", "download", "branch", "savedAt", "ideaCount", "brainCount", "twistCount", "conflictScore", "output", "ideas", "logic", "timeline", "toast", "history-panel", "trends-panel", "history-toggle", "trends-toggle", "history-search", "history-list", "clear-history", "trends-content"].forEach(function (id) {
+        ["story-form", "imagine-start", "inspiration-bubbles", "keywords", "genre", "intensity", "hero", "focus", "seedIdea", "generate", "randomize", "clear", "copy", "download", "branch", "savedAt", "ideaCount", "brainCount", "twistCount", "conflictScore", "output", "ideas", "logic", "timeline", "toast", "history-panel", "trends-panel", "history-toggle", "trends-toggle", "history-search", "history-list", "clear-history", "trends-content", "mindmap-toolbar", "mindmap-reset", "mindmap-expand", "mindmap-collapse", "compare-toggle", "compare-panel", "compare-a", "compare-b", "compare-run", "compare-grid", "annotation-panel", "annotation-title", "annotation-node-title", "annotation-node-event", "annotation-note", "annotation-close", "annotation-save", "annotation-regenerate"].forEach(function (id) {
           dom[id] = $(id);
         });
         dom.form = dom["story-form"];
@@ -1637,6 +1931,24 @@
         dom.historyList = dom["history-list"];
         dom.clearHistory = dom["clear-history"];
         dom.trendsContent = dom["trends-content"];
+        dom.mindmapToolbar = dom["mindmap-toolbar"];
+        dom.mindmapReset = dom["mindmap-reset"];
+        dom.mindmapExpand = dom["mindmap-expand"];
+        dom.mindmapCollapse = dom["mindmap-collapse"];
+        dom.compareToggle = dom["compare-toggle"];
+        dom.comparePanel = dom["compare-panel"];
+        dom.compareA = dom["compare-a"];
+        dom.compareB = dom["compare-b"];
+        dom.compareRun = dom["compare-run"];
+        dom.compareGrid = dom["compare-grid"];
+        dom.annotationPanel = dom["annotation-panel"];
+        dom.annotationTitle = dom["annotation-title"];
+        dom.annotationNodeTitle = dom["annotation-node-title"];
+        dom.annotationNodeEvent = dom["annotation-node-event"];
+        dom.annotationNote = dom["annotation-note"];
+        dom.annotationClose = dom["annotation-close"];
+        dom.annotationSave = dom["annotation-save"];
+        dom.annotationRegenerate = dom["annotation-regenerate"];
       }
 
       function pick(list) {
@@ -1984,10 +2296,104 @@
         dom.conflictScore.textContent = result ? result.score : 0;
       }
 
+      function branchColor(path) {
+        var palette = ["#19c8b9", "#f7cd67", "#f8a6b2", "#b77dee", "#82d5bb", "#f2994a", "#7dc395", "#b7c6e5"];
+        var seed = path.split(".").reduce(function (sum, part) {
+          return sum + Number(part || 0);
+        }, 0);
+        return palette[seed % palette.length];
+      }
+
+      function applyTimelineAnnotations(node) {
+        var saved = app.timelineAnnotations[node.uid];
+        if (saved) {
+          node.title = saved.title || node.title;
+          node.event = saved.event || node.event;
+          node.note = saved.note || "";
+          node.collapsed = Boolean(saved.collapsed);
+          node.x = typeof saved.x === "number" ? saved.x : node.x;
+          node.y = typeof saved.y === "number" ? saved.y : node.y;
+        }
+        node.branches.forEach(function (branch) {
+          applyTimelineAnnotations(branch.next);
+        });
+      }
+
+      function collectTimelineNodes(node, list, parent) {
+        var output = list || [];
+        output.push({ node: node, parent: parent || null });
+        node.branches.forEach(function (branch) {
+          collectTimelineNodes(branch.next, output, node);
+        });
+        return output;
+      }
+
+      function findTimelineNode(id, node) {
+        if (!node) return null;
+        if (node.uid === id) return node;
+        for (var i = 0; i < node.branches.length; i += 1) {
+          var found = findTimelineNode(id, node.branches[i].next);
+          if (found) return found;
+        }
+        return null;
+      }
+
+      function timelineLeafPaths(root) {
+        var paths = [];
+        function walk(node, branches) {
+          if (!node.branches.length) {
+            paths.push({ leaf: node, nodes: branches.map(function (item) { return item.node; }), branches: branches });
+            return;
+          }
+          node.branches.forEach(function (branch) {
+            walk(branch.next, branches.concat([{ node: branch.next, branch: branch }]));
+          });
+        }
+        if (root) walk(root, [{ node: root, branch: null }]);
+        return paths;
+      }
+
+      function saveTimelineAnnotations() {
+        if (!app.timeline) return;
+        var next = {};
+        collectTimelineNodes(app.timeline).forEach(function (entry) {
+          var node = entry.node;
+          if (node.note || node.collapsed || node.title !== node.originalTitle || node.event !== node.originalEvent || node.x !== node.defaultX || node.y !== node.defaultY) {
+            next[node.uid] = {
+              title: node.title,
+              event: node.event,
+              note: node.note || "",
+              collapsed: Boolean(node.collapsed),
+              x: node.x,
+              y: node.y
+            };
+          }
+        });
+        app.timelineAnnotations = next;
+      }
+
       function createTimeline(input, result, tree) {
         var id = 1;
-        function node(title, event, depth) {
-          var item = { id: id, title: "节点 " + id + "：" + title, event: event, depth: depth, branches: [] };
+        function node(title, event, depth, path) {
+          var displayTitle = "节点 " + id + "：" + title;
+          var item = {
+            id: id,
+            uid: "n-" + path,
+            path: path,
+            title: displayTitle,
+            originalTitle: displayTitle,
+            event: event,
+            originalEvent: event,
+            depth: depth,
+            color: branchColor(path),
+            note: "",
+            collapsed: false,
+            x: 80 + depth * 300,
+            y: 270,
+            defaultX: 80 + depth * 300,
+            defaultY: 270,
+            branches: []
+          };
           id += 1;
           return item;
         }
@@ -2015,32 +2421,59 @@
           if (depth >= maxDepth) return;
           var first = branchChoice(avoidText);
           var second = branchChoice(first.choice);
-          current.branches = [first, second].map(function (choice) {
+          current.branches = [first, second].map(function (choice, index) {
             var end = depth + 1 >= maxDepth;
             var outcome = createOutcome(choice, depth, end);
-            var next = node(outcome.label, outcome.event, depth + 1);
+            var nextPath = current.path + "." + (index + 1);
+            var next = node(outcome.label, outcome.event, depth + 1, nextPath);
             var branch = {
               choice: choice.choice,
               result: choice.result,
+              color: branchColor(nextPath),
               next: next
             };
             expand(next, depth + 1, maxDepth, choice.choice);
             return branch;
           });
         }
-        var root = node("源头事件", nodeText(tree, "source") + " 第一处分叉来自主角如何回应阻碍：“" + result.obstacle + "”。", 0);
+        var root = node("源头事件", nodeText(tree, "source") + " 第一处分叉来自主角如何回应阻碍：“" + result.obstacle + "”。", 0, "1");
         expand(root, 0, 2, "");
+        layoutTimelineMap(root);
+        applyTimelineAnnotations(root);
         return root;
+      }
+
+      function layoutTimelineMap(root) {
+        if (!root) return;
+        var leafIndex = 0;
+        function place(node, depth) {
+          node.depth = depth;
+          node.x = 70 + depth * 310;
+          node.defaultX = node.x;
+          if (!node.branches.length) {
+            node.y = 80 + leafIndex * 150;
+            node.defaultY = node.y;
+            leafIndex += 1;
+            return node.y;
+          }
+          var childYs = node.branches.map(function (branch) {
+            return place(branch.next, depth + 1);
+          });
+          node.y = childYs.reduce(function (sum, y) { return sum + y; }, 0) / childYs.length;
+          node.defaultY = node.y;
+          return node.y;
+        }
+        place(root, 0);
       }
 
       function timelineNodeHTML(item) {
         var endingClass = item.branches.length === 0 && item.depth > 0 ? " timeline-ending" : "";
-        var html = "<div class=\"timeline-node\" data-node-id=\"" + item.id + "\" data-depth=\"" + item.depth + "\">";
-        html += "<div class=\"timeline-card" + endingClass + "\" data-card=\"node\"><b>" + escapeHTML(item.title) + "</b><span>" + escapeHTML(item.event) + "</span></div>";
-        if (item.branches.length) {
+        var html = "<div class=\"timeline-node\" data-node-id=\"" + item.uid + "\" data-depth=\"" + item.depth + "\">";
+        html += "<div class=\"timeline-card" + endingClass + "\" data-card=\"node\"><b>" + escapeHTML(item.title) + "</b><span>" + escapeHTML(item.event) + "</span>" + (item.note ? "<small class=\"mindmap-note\">" + escapeHTML(item.note) + "</small>" : "") + "</div>";
+        if (item.branches.length && !item.collapsed) {
           html += "<div class=\"timeline-branches\">";
           html += item.branches.map(function (branch) {
-            return "<div class=\"timeline-path\"><div class=\"choice-card\" data-card=\"choice\"><b>选择：" + escapeHTML(branch.choice) + "</b><span>结果：" + escapeHTML(branch.result) + "</span></div>" + timelineNodeHTML(branch.next) + "</div>";
+            return "<div class=\"timeline-path\"><div class=\"choice-card\" data-card=\"choice\" style=\"border-left: 6px solid " + escapeHTML(branch.color) + "\"><b>选择：" + escapeHTML(branch.choice) + "</b><span>结果：" + escapeHTML(branch.result) + "</span></div>" + timelineNodeHTML(branch.next) + "</div>";
           }).join("");
           html += "</div>";
         }
@@ -2050,7 +2483,7 @@
 
       function timelineText(item, indent) {
         var space = indent || "";
-        var lines = [space + item.title + "：" + item.event];
+        var lines = [space + item.title + "：" + item.event + (item.note ? "（批注：" + item.note + "）" : "")];
         item.branches.forEach(function (branch) {
           lines.push(space + "  选择：" + branch.choice);
           lines.push(space + "  结果：" + branch.result);
@@ -2063,7 +2496,47 @@
         return "<svg class=\"timeline-flow\" id=\"timelineFlow\" aria-hidden=\"true\"><defs><filter id=\"timelineGlow\" x=\"-70%\" y=\"-70%\" width=\"240%\" height=\"240%\"><feGaussianBlur stdDeviation=\"3.2\" result=\"blur\"></feGaussianBlur><feMerge><feMergeNode in=\"blur\"></feMergeNode><feMergeNode in=\"SourceGraphic\"></feMergeNode></feMerge></filter></defs></svg>";
       }
 
+      function renderMindmap(timeline) {
+        if (!timeline) {
+          return "<div class=\"mindmap-stage\"><div class=\"timeline-card\"><b>还没有导图</b><span>生成冲突后会出现可拖拽思维导图。</span></div></div>";
+        }
+        var entries = collectTimelineNodes(timeline);
+        var links = [];
+        entries.forEach(function (entry) {
+          entry.node.branches.forEach(function (branch) {
+            if (entry.node.collapsed) return;
+            var fromX = entry.node.x + 230;
+            var fromY = entry.node.y + 58;
+            var toX = branch.next.x;
+            var toY = branch.next.y + 58;
+            var mid = Math.max(70, (toX - fromX) * 0.5);
+            links.push("<path class=\"mindmap-link\" stroke=\"" + escapeHTML(branch.color) + "\" d=\"M " + fromX + " " + fromY + " C " + (fromX + mid) + " " + fromY + ", " + (toX - mid) + " " + toY + ", " + toX + " " + toY + "\"></path>");
+          });
+        });
+        var nodes = entries.map(function (entry) {
+          var node = entry.node;
+          var selected = app.selectedNodeId === node.uid ? " is-selected" : "";
+          var ending = node.branches.length ? "" : " is-ending";
+          var collapsed = node.collapsed ? " is-collapsed" : "";
+          return "<article class=\"mindmap-node" + selected + ending + collapsed + "\" data-map-node=\"" + escapeHTML(node.uid) + "\" style=\"left:" + node.x + "px; top:" + node.y + "px; border-top: 8px solid " + escapeHTML(node.color) + "\">" +
+            "<div class=\"mindmap-node-head\"><h4 class=\"mindmap-node-title\">" + escapeHTML(node.title) + "</h4><button type=\"button\" class=\"mindmap-mini-button\" data-map-action=\"toggle\">" + (node.collapsed ? "展开" : "折叠") + "</button></div>" +
+            "<p class=\"mindmap-node-body\">" + escapeHTML(node.event) + "</p>" +
+            (node.note ? "<p class=\"mindmap-note\">" + escapeHTML(node.note) + "</p>" : "") +
+            "<div class=\"mindmap-node-actions\"><button type=\"button\" class=\"mindmap-mini-button\" data-map-action=\"annotate\">批注</button><button type=\"button\" class=\"mindmap-mini-button\" data-map-action=\"regenerate\">重生成后续</button></div>" +
+          "</article>";
+        }).join("");
+        return "<div class=\"mindmap-stage\" id=\"mindmap-stage\"><div class=\"mindmap-canvas\" id=\"mindmap-canvas\" style=\"transform: translate(" + app.mapView.x + "px, " + app.mapView.y + "px)\"><svg class=\"mindmap-links\" width=\"1180\" height=\"620\" aria-hidden=\"true\">" + links.join("") + "</svg>" + nodes + "</div></div>";
+      }
+
       function renderTimeline(timeline) {
+        if (app.timelineLayout === "map") {
+          dom.timeline.innerHTML = renderMindmap(timeline);
+          dom.timeline.dataset.text = timeline ? timelineText(timeline) : "还没有导图。";
+          dom.timeline.classList.remove("timeline-vertical", "timeline-horizontal");
+          dom.timeline.classList.add("timeline-map");
+          renderCompareOptions();
+          return;
+        }
         if (!timeline) {
           dom.timeline.innerHTML = timelineSvg() + "<div class=\"timeline-card\"><b>节点 1：源头事件</b><span>生成冲突后，这里会展开多条可能的结局线。</span></div>";
           dom.timeline.dataset.text = "节点 1：源头事件：生成冲突后，这里会展开多条可能的结局线。";
@@ -2073,12 +2546,15 @@
         }
         setTimelineLayout(app.timelineLayout, false);
         scheduleTimelineFlow();
+        renderCompareOptions();
       }
 
       function setTimelineLayout(layout, shouldSave) {
-        app.timelineLayout = layout === "horizontal" ? "horizontal" : "vertical";
+        app.timelineLayout = layout === "horizontal" || layout === "map" ? layout : "vertical";
+        dom.mindmapToolbar.style.display = app.timelineLayout === "map" ? "flex" : "none";
         dom.timeline.classList.toggle("timeline-horizontal", app.timelineLayout === "horizontal");
         dom.timeline.classList.toggle("timeline-vertical", app.timelineLayout === "vertical");
+        dom.timeline.classList.toggle("timeline-map", app.timelineLayout === "map");
         dom.timeline.scrollTop = 0;
         dom.timeline.scrollLeft = 0;
         document.querySelectorAll("[data-timeline-layout]").forEach(function (button) {
@@ -2087,7 +2563,11 @@
           button.setAttribute("aria-pressed", active ? "true" : "false");
         });
         if (shouldSave !== false) saveDraft();
-        scheduleTimelineFlow();
+        if (app.timelineLayout === "map") {
+          renderTimeline(app.timeline);
+        } else {
+          scheduleTimelineFlow();
+        }
       }
 
       function directChild(parent, selector) {
@@ -2174,12 +2654,193 @@
         window.requestAnimationFrame(drawTimelineFlow);
       }
 
+      function openAnnotationPanel(nodeId) {
+        var node = findTimelineNode(nodeId, app.timeline);
+        if (!node) return;
+        app.selectedNodeId = nodeId;
+        dom.annotationTitle.textContent = "编辑：" + node.title;
+        dom.annotationNodeTitle.value = node.title;
+        dom.annotationNodeEvent.value = node.event;
+        dom.annotationNote.value = node.note || "";
+        dom.annotationPanel.classList.add("is-open");
+        dom.annotationPanel.setAttribute("aria-hidden", "false");
+        renderTimeline(app.timeline);
+      }
+
+      function closeAnnotationPanel() {
+        dom.annotationPanel.classList.remove("is-open");
+        dom.annotationPanel.setAttribute("aria-hidden", "true");
+      }
+
+      function saveAnnotationPanel() {
+        var node = findTimelineNode(app.selectedNodeId, app.timeline);
+        if (!node) return;
+        node.title = dom.annotationNodeTitle.value.trim() || node.title;
+        node.event = dom.annotationNodeEvent.value.trim() || node.event;
+        node.note = dom.annotationNote.value.trim();
+        saveTimelineAnnotations();
+        renderTimeline(app.timeline);
+        notify("节点已保存");
+      }
+
+      function regenerateNodeBranches(nodeId) {
+        var node = findTimelineNode(nodeId, app.timeline);
+        if (!node || !app.input || !app.result) return;
+        var fresh = createTimeline(app.input, app.result, app.result.tree);
+        var counterpart = findTimelineNode(nodeId, fresh);
+        if (!counterpart) return;
+        node.branches = counterpart.branches;
+        layoutTimelineMap(app.timeline);
+        applyTimelineAnnotations(app.timeline);
+        renderTimeline(app.timeline);
+        renderCompareOptions();
+        notify("已重生成该节点后续分支");
+      }
+
+      function renderCompareOptions() {
+        if (!dom.compareA || !app.timeline) return;
+        var leaves = timelineLeafPaths(app.timeline);
+        dom.compareA.innerHTML = leaves.map(function (path, index) {
+          return "<option value=\"" + escapeHTML(path.leaf.uid) + "\">结局 " + (index + 1) + " · " + escapeHTML(path.leaf.title) + "</option>";
+        }).join("");
+        dom.compareB.innerHTML = leaves.map(function (path, index) {
+          return "<option value=\"" + escapeHTML(path.leaf.uid) + "\"" + (index === 1 ? " selected" : "") + ">结局 " + (index + 1) + " · " + escapeHTML(path.leaf.title) + "</option>";
+        }).join("");
+        if (leaves.length >= 2) renderBranchComparison();
+      }
+
+      function pathByLeafId(leafId) {
+        return timelineLeafPaths(app.timeline).find(function (path) {
+          return path.leaf.uid === leafId;
+        });
+      }
+
+      function renderBranchComparison() {
+        if (!app.timeline) {
+          dom.compareGrid.innerHTML = "<p class=\"small\">生成冲突后才能对比分支。</p>";
+          return;
+        }
+        var left = pathByLeafId(dom.compareA.value);
+        var right = pathByLeafId(dom.compareB.value);
+        if (!left || !right) return;
+        var divergence = 0;
+        var max = Math.max(left.nodes.length, right.nodes.length);
+        for (var i = 0; i < max; i += 1) {
+          if (!left.nodes[i] || !right.nodes[i] || left.nodes[i].uid !== right.nodes[i].uid) {
+            divergence = Math.max(0, i);
+            break;
+          }
+        }
+        function column(path, label) {
+          return "<section class=\"compare-column\"><h4>" + label + "</h4>" + path.nodes.map(function (node, index) {
+            var className = index === divergence ? " is-divergence" : index > divergence ? " is-different" : "";
+            return "<p class=\"compare-step" + className + "\"><b>" + escapeHTML(node.title) + "</b><br>" + escapeHTML(node.event) + (node.note ? "<br><em>批注：" + escapeHTML(node.note) + "</em>" : "") + "</p>";
+          }).join("") + "</section>";
+        }
+        dom.compareGrid.innerHTML = column(left, "分支 A") + column(right, "分支 B");
+      }
+
+      function toggleComparePanel() {
+        app.compareMode = !app.compareMode;
+        dom.comparePanel.classList.toggle("is-open", app.compareMode);
+        dom.compareToggle.classList.toggle("is-active", app.compareMode);
+        if (app.compareMode) {
+          renderCompareOptions();
+          renderBranchComparison();
+        }
+      }
+
+      function startMindmapDrag(event) {
+        if (event.target.closest("button")) return;
+        var nodeEl = event.target.closest(".mindmap-node");
+        if (nodeEl) {
+          var node = findTimelineNode(nodeEl.dataset.mapNode, app.timeline);
+          if (!node) return;
+          app.nodeDrag = {
+            id: node.uid,
+            x: event.clientX,
+            y: event.clientY,
+            startX: node.x,
+            startY: node.y,
+            moved: false
+          };
+          return;
+        }
+        var stage = event.target.closest(".mindmap-stage");
+        if (!stage) return;
+        app.mapDrag = { x: event.clientX, y: event.clientY, startX: app.mapView.x, startY: app.mapView.y };
+        stage.classList.add("is-dragging");
+      }
+
+      function moveMindmapDrag(event) {
+        if (app.nodeDrag) {
+          var node = findTimelineNode(app.nodeDrag.id, app.timeline);
+          var nodeEl = document.querySelector("[data-map-node='" + app.nodeDrag.id + "']");
+          if (!node || !nodeEl) return;
+          var dx = event.clientX - app.nodeDrag.x;
+          var dy = event.clientY - app.nodeDrag.y;
+          if (Math.abs(dx) + Math.abs(dy) > 4) app.nodeDrag.moved = true;
+          node.x = Math.max(10, app.nodeDrag.startX + dx);
+          node.y = Math.max(10, app.nodeDrag.startY + dy);
+          nodeEl.style.left = node.x + "px";
+          nodeEl.style.top = node.y + "px";
+          return;
+        }
+        if (!app.mapDrag) return;
+        app.mapView.x = app.mapDrag.startX + event.clientX - app.mapDrag.x;
+        app.mapView.y = app.mapDrag.startY + event.clientY - app.mapDrag.y;
+        var canvas = $("mindmap-canvas");
+        if (canvas) canvas.style.transform = "translate(" + app.mapView.x + "px, " + app.mapView.y + "px)";
+      }
+
+      function endMindmapDrag() {
+        if (app.nodeDrag) {
+          app.suppressNodeClick = app.nodeDrag.moved;
+          saveTimelineAnnotations();
+          renderTimeline(app.timeline);
+          app.nodeDrag = null;
+          if (app.suppressNodeClick) {
+            window.setTimeout(function () { app.suppressNodeClick = false; }, 80);
+          }
+          return;
+        }
+        app.mapDrag = null;
+        var stage = $("mindmap-stage");
+        if (stage) stage.classList.remove("is-dragging");
+      }
+
+      function handleMindmapClick(event) {
+        if (app.suppressNodeClick) return;
+        var action = event.target.closest("[data-map-action]");
+        var nodeEl = event.target.closest("[data-map-node]");
+        if (!nodeEl) return;
+        var node = findTimelineNode(nodeEl.dataset.mapNode, app.timeline);
+        if (!node) return;
+        app.selectedNodeId = node.uid;
+        if (!action) {
+          node.collapsed = !node.collapsed;
+          saveTimelineAnnotations();
+          renderTimeline(app.timeline);
+          return;
+        }
+        if (action.dataset.mapAction === "toggle") {
+          node.collapsed = !node.collapsed;
+          saveTimelineAnnotations();
+          renderTimeline(app.timeline);
+        }
+        if (action.dataset.mapAction === "annotate") openAnnotationPanel(node.uid);
+        if (action.dataset.mapAction === "regenerate") regenerateNodeBranches(node.uid);
+      }
+
       function generate(options) {
         var settings = options || {};
         var input = getInput();
         var tree = buildStoryTree(input);
         var ideas = buildIdeas(input, tree);
         var result = buildResult(input, ideas, tree);
+        app.timelineAnnotations = {};
+        app.selectedNodeId = null;
+        closeAnnotationPanel();
         var timeline = createTimeline(input, result, tree);
         app.input = input;
         app.ideas = ideas;
@@ -2208,6 +2869,12 @@
         app.ideas = [];
         app.result = null;
         app.timeline = null;
+        app.timelineAnnotations = {};
+        app.selectedNodeId = null;
+        app.compareMode = false;
+        closeAnnotationPanel();
+        dom.comparePanel.classList.remove("is-open");
+        dom.compareToggle.classList.remove("is-active");
         dom.output.innerHTML = "<h3>等一个关键词</h3><p>先输入几个词，比如人物、地点、物件、秘密或情绪。这个工具会把散点推成冲突。</p>";
         dom.ideas.innerHTML = "";
         dom.logic.innerHTML = "";
@@ -2369,13 +3036,54 @@
           renderTimeline(app.timeline);
           notify("分支时间线已重组");
         });
+        dom.mindmapReset.addEventListener("click", function () {
+          app.mapView = { x: 0, y: 0 };
+          if (app.timeline) {
+            layoutTimelineMap(app.timeline);
+            renderTimeline(app.timeline);
+          }
+        });
+        dom.mindmapExpand.addEventListener("click", function () {
+          if (!app.timeline) return;
+          collectTimelineNodes(app.timeline).forEach(function (entry) {
+            entry.node.collapsed = false;
+          });
+          saveTimelineAnnotations();
+          renderTimeline(app.timeline);
+        });
+        dom.mindmapCollapse.addEventListener("click", function () {
+          if (!app.timeline) return;
+          collectTimelineNodes(app.timeline).forEach(function (entry) {
+            entry.node.collapsed = entry.node.depth >= 1;
+          });
+          saveTimelineAnnotations();
+          renderTimeline(app.timeline);
+        });
+        dom.timeline.addEventListener("click", handleMindmapClick);
+        dom.timeline.addEventListener("mousedown", startMindmapDrag);
+        document.addEventListener("mousemove", moveMindmapDrag);
+        document.addEventListener("mouseup", endMindmapDrag);
+        dom.compareToggle.addEventListener("click", toggleComparePanel);
+        dom.compareRun.addEventListener("click", renderBranchComparison);
+        dom.compareA.addEventListener("change", renderBranchComparison);
+        dom.compareB.addEventListener("change", renderBranchComparison);
+        dom.annotationClose.addEventListener("click", closeAnnotationPanel);
+        dom.annotationSave.addEventListener("click", saveAnnotationPanel);
+        dom.annotationRegenerate.addEventListener("click", function () {
+          saveAnnotationPanel();
+          regenerateNodeBranches(app.selectedNodeId);
+          closeAnnotationPanel();
+        });
         dom.historyToggle.addEventListener("click", function () { togglePanel("history-panel"); });
         dom.trendsToggle.addEventListener("click", function () { togglePanel("trends-panel"); });
         document.querySelectorAll(".close-panel").forEach(function (button) {
           button.addEventListener("click", function () { togglePanel(button.dataset.panel, false); });
         });
         document.querySelectorAll("[data-timeline-layout]").forEach(function (button) {
-          button.addEventListener("click", function () { setTimelineLayout(button.dataset.timelineLayout); });
+          button.addEventListener("click", function () {
+            setTimelineLayout(button.dataset.timelineLayout);
+            renderTimeline(app.timeline);
+          });
         });
         dom.ideas.addEventListener("click", function (event) {
           var card = event.target.closest("[data-idea-index]");
