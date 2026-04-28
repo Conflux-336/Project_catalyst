@@ -1,0 +1,601 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sacred Timeline | Sacred Time</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      overflow: hidden;
+      background: #000;
+      font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+
+    canvas {
+      display: block;
+    }
+
+    #info {
+      position: absolute;
+      top: 24px;
+      left: 50%;
+      transform: translateX(-50%);
+      color: #FFB900;
+      font-size: 14px;
+      letter-spacing: 4px;
+      text-transform: uppercase;
+      text-shadow: 0 0 20px #FFB900, 0 0 40px #FF6600;
+      opacity: 0.8;
+      pointer-events: none;
+      z-index: 100;
+    }
+
+    #stats {
+      position: absolute;
+      bottom: 24px;
+      left: 24px;
+      color: #666;
+      font-size: 11px;
+      letter-spacing: 2px;
+      z-index: 100;
+    }
+
+    #stats span {
+      color: #FFB900;
+    }
+
+    .vignette {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      background: radial-gradient(ellipse at center, transparent 0%, transparent 50%, rgba(0,0,0,0.8) 100%);
+      z-index: 50;
+    }
+
+    .scan-line {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, #FFB900, #FF6600, transparent);
+      animation: scan 6s linear infinite;
+      pointer-events: none;
+      z-index: 51;
+      opacity: 0.3;
+    }
+
+    @keyframes scan {
+      0% { transform: translateY(0); }
+      100% { transform: translateY(100vh); }
+    }
+
+    #loading {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      color: #FFB900;
+      font-size: 16px;
+      letter-spacing: 4px;
+      z-index: 200;
+      animation: pulse 1.5s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 0.5; }
+      50% { opacity: 1; }
+    }
+  </style>
+</head>
+<body>
+  <div id="loading">INITIALIZING TIMELINE...</div>
+  <div id="info">Sacred Timeline</div>
+  <div id="stats">
+    BRANCHES: <span id="branchCount">0</span> |
+    DEPTH: <span id="depthCount">0</span> |
+    NEXUS EVENTS: <span id="nexusCount">0</span>
+  </div>
+  <div class="vignette"></div>
+  <div class="scan-line"></div>
+
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+      "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+    }
+  }
+  </script>
+
+  <script type="module">
+    import * as THREE from 'three';
+    import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
+    import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
+    import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
+
+    const AMBER_GOLD = 0xFFB900;
+    const AMBER_ORANGE = 0xFF6600;
+    const NEXUS_RED = 0xFF2200;
+
+    class SimplexNoise {
+      constructor(seed = Math.random()) {
+        this.p = new Uint8Array(256);
+        this.perm = new Uint8Array(512);
+        this.permMod12 = new Uint8Array(512);
+
+        for (let i = 0; i < 256; i++) {
+          this.p[i] = i;
+        }
+
+        for (let i = 255; i > 0; i--) {
+          seed = (seed * 16807) % 2147483647;
+          const n = seed % (i + 1);
+          [this.p[i], this.p[n]] = [this.p[n], this.p[i]];
+        }
+
+        for (let i = 0; i < 512; i++) {
+          this.perm[i] = this.p[i & 255];
+          this.permMod12[i] = this.perm[i] % 12;
+        }
+
+        this.grad3 = new Float32Array([
+          1,1,0, -1,1,0, 1,-1,0, -1,-1,0,
+          1,0,1, -1,0,1, 1,0,-1, -1,0,-1,
+          0,1,1, 0,-1,1, 0,1,-1, 0,-1,-1
+        ]);
+
+        this.F2 = 0.5 * (Math.sqrt(3) - 1);
+        this.G2 = (3 - Math.sqrt(3)) / 6;
+      }
+
+      dot2(gi, x, y) {
+        const idx = gi * 3;
+        return this.grad3[idx] * x + this.grad3[idx + 1] * y;
+      }
+
+      noise2D(xin, yin) {
+        const { F2, G2, perm, permMod12 } = this;
+        let n0, n1, n2;
+
+        const s = (xin + yin) * F2;
+        const i = Math.floor(xin + s);
+        const j = Math.floor(yin + s);
+        const t = (i + j) * G2;
+        const X0 = i - t;
+        const Y0 = j - t;
+        const x0 = xin - X0;
+        const y0 = yin - Y0;
+
+        let i1, j1;
+        if (x0 > y0) { i1 = 1; j1 = 0; }
+        else { i1 = 0; j1 = 1; }
+
+        const x1 = x0 - i1 + G2;
+        const y1 = y0 - j1 + G2;
+        const x2 = x0 - 1 + 2 * G2;
+        const y2 = y0 - 1 + 2 * G2;
+
+        const ii = i & 255;
+        const jj = j & 255;
+        const gi0 = permMod12[ii + perm[jj]];
+        const gi1 = permMod12[ii + i1 + perm[jj + j1]];
+        const gi2 = permMod12[ii + 1 + perm[jj + 1]];
+
+        let t0 = 0.5 - x0 * x0 - y0 * y0;
+        if (t0 < 0) n0 = 0;
+        else {
+          t0 *= t0;
+          n0 = t0 * t0 * this.dot2(gi0, x0, y0);
+        }
+
+        let t1 = 0.5 - x1 * x1 - y1 * y1;
+        if (t1 < 0) n1 = 0;
+        else {
+          t1 *= t1;
+          n1 = t1 * t1 * this.dot2(gi1, x1, y1);
+        }
+
+        let t2 = 0.5 - x2 * x2 - y2 * y2;
+        if (t2 < 0) n2 = 0;
+        else {
+          t2 *= t2;
+          n2 = t2 * t2 * this.dot2(gi2, x2, y2);
+        }
+
+        return 70 * (n0 + n1 + n2);
+      }
+
+      fractalNoise(x, y, octaves = 4, persistence = 0.5, lacunarity = 2) {
+        let total = 0;
+        let frequency = 1;
+        let amplitude = 1;
+        let maxValue = 0;
+
+        for (let i = 0; i < octaves; i++) {
+          total += this.noise2D(x * frequency, y * frequency) * amplitude;
+          maxValue += amplitude;
+          amplitude *= persistence;
+          frequency *= lacunarity;
+        }
+
+        return total / maxValue;
+      }
+    }
+
+    class TimelineBranch {
+      constructor(startPos, endPos, depth, parent, scene, noise) {
+        this.startPos = startPos.clone();
+        this.endPos = endPos.clone();
+        this.targetEndPos = endPos.clone();
+        this.depth = depth;
+        this.parent = parent;
+        this.scene = scene;
+        this.noise = noise;
+        this.children = [];
+        this.progress = 0;
+        this.growthSpeed = 0.008 + Math.random() * 0.004;
+        this.baseWidth = Math.max(0.02, 0.15 - depth * 0.025);
+        this.isNexus = depth > 3 && Math.random() > 0.85;
+        this.noiseOffset = Math.random() * 1000;
+        this.time = 0;
+        this.maxDepth = 12;
+        this.line = null;
+        this.glowLine = null;
+        this.points = [];
+        this.originalPoints = [];
+        this.segments = 50;
+        this.mouseInfluence = 0;
+        this.mousePos = new THREE.Vector3();
+        this.createLine();
+      }
+
+      createLine() {
+        const curve = new THREE.LineCurve3(this.startPos, this.endPos);
+        const geometry = new THREE.BufferGeometry().setFromPoints(curve.getPoints(this.segments));
+        const material = new THREE.LineBasicMaterial({
+          color: this.isNexus ? NEXUS_RED : AMBER_GOLD,
+          transparent: true,
+          opacity: 1 - (this.depth / this.maxDepth) * 0.6
+        });
+        this.line = new THREE.Line(geometry, material);
+        this.scene.add(this.line);
+
+        const glowMaterial = new THREE.LineBasicMaterial({
+          color: this.isNexus ? NEXUS_RED : AMBER_ORANGE,
+          transparent: true,
+          opacity: 0.3 * (1 - (this.depth / this.maxDepth) * 0.6)
+        });
+        this.glowLine = new THREE.Line(geometry.clone(), glowMaterial);
+        this.glowLine.scale.set(1.5, 1.5, 1.5);
+        this.scene.add(this.glowLine);
+
+        this.points = geometry.attributes.position.array;
+        this.originalPoints = new Float32Array(this.points.length);
+        for (let i = 0; i < this.points.length; i++) {
+          this.originalPoints[i] = this.points[i];
+        }
+      }
+
+      update(time, deltaTime, mousePos3D) {
+        this.time = time;
+        if (this.progress < 1) {
+          this.progress += this.growthSpeed;
+          this.progress = Math.min(1, this.progress);
+          this.updateGeometry();
+        }
+
+        if (mousePos3D) {
+          this.mousePos.copy(mousePos3D);
+          const lineCenter = new THREE.Vector3().addVectors(this.startPos, this.endPos).multiplyScalar(0.5);
+          const dist = lineCenter.distanceTo(mousePos3D);
+          this.mouseInfluence = Math.max(0, 1 - dist / 3) * 0.5;
+        } else {
+          this.mouseInfluence *= 0.95;
+        }
+
+        const positions = this.line.geometry.attributes.position.array;
+        const glowPositions = this.glowLine.geometry.attributes.position.array;
+
+        for (let i = 0; i < this.segments + 1; i++) {
+          const idx = i * 3;
+          const t = i / this.segments;
+          const progressFactor = Math.min(1, this.progress * 1.2 - t * 0.2);
+
+          const noiseX = this.noise.fractalNoise(
+            t * 2 + this.noiseOffset,
+            this.time * 0.5 + this.depth * 0.1,
+            3
+          ) * 0.3;
+          const noiseY = this.noise.fractalNoise(
+            t * 2 + this.noiseOffset + 100,
+            this.time * 0.3 + this.depth * 0.1,
+            3
+          ) * 0.3;
+
+          let offsetX = noiseX * progressFactor;
+          let offsetY = noiseY * progressFactor;
+
+          if (this.mouseInfluence > 0.01) {
+            const linePoint = new THREE.Vector3(
+              this.originalPoints[idx],
+              this.originalPoints[idx + 1],
+              this.originalPoints[idx + 2]
+            );
+            const toMouse = new THREE.Vector3().subVectors(this.mousePos, linePoint);
+            const repelDist = 1.5;
+            if (toMouse.length() < repelDist) {
+              const repelStrength = (1 - toMouse.length() / repelDist) * this.mouseInfluence;
+              toMouse.normalize().multiplyScalar(repelStrength * 0.5);
+              offsetX += toMouse.x;
+              offsetY += toMouse.y;
+            }
+          }
+
+          positions[idx] = this.originalPoints[idx] + offsetX;
+          positions[idx + 1] = this.originalPoints[idx + 1] + offsetY;
+          positions[idx + 2] = this.originalPoints[idx + 2];
+
+          glowPositions[idx] = positions[idx];
+          glowPositions[idx + 1] = positions[idx + 1];
+          glowPositions[idx + 2] = positions[idx + 2];
+        }
+
+        this.line.geometry.attributes.position.needsUpdate = true;
+        this.glowLine.geometry.attributes.position.needsUpdate = true;
+
+        const baseOpacity = (1 - (this.depth / this.maxDepth) * 0.6) * progressFactor;
+        this.line.material.opacity = baseOpacity;
+        this.glowLine.material.opacity = baseOpacity * 0.3;
+
+        for (const child of this.children) {
+          child.update(time, deltaTime, mousePos3D);
+        }
+      }
+
+      updateGeometry() {
+        const currentEnd = new THREE.Vector3().lerpVectors(this.startPos, this.targetEndPos, this.progress);
+        const positions = this.line.geometry.attributes.position.array;
+
+        for (let i = 0; i < this.segments + 1; i++) {
+          const t = i / this.segments;
+          const idx = i * 3;
+          positions[idx] = this.startPos.x + (currentEnd.x - this.startPos.x) * t;
+          positions[idx + 1] = this.startPos.y + (currentEnd.y - this.startPos.y) * t;
+          positions[idx + 2] = this.startPos.z + (currentEnd.z - this.startPos.z) * t;
+          this.originalPoints[idx] = positions[idx];
+          this.originalPoints[idx + 1] = positions[idx + 1];
+          this.originalPoints[idx + 2] = positions[idx + 2];
+        }
+
+        this.line.geometry.attributes.position.needsUpdate = true;
+        this.glowLine.geometry.attributes.position.needsUpdate = true;
+      }
+
+      canBranch() {
+        return this.progress > 0.6 && this.children.length < 3 && this.depth < this.maxDepth;
+      }
+
+      createChildBranches() {
+        if (!this.canBranch()) return;
+
+        const branchChance = 0.02 + (this.depth * 0.005);
+        if (Math.random() > branchChance) return;
+
+        const numBranches = Math.random() > 0.7 ? 2 : 1;
+        const endPoint = new THREE.Vector3().lerpVectors(this.startPos, this.targetEndPos, 0.8);
+
+        for (let i = 0; i < numBranches; i++) {
+          const angle = (Math.PI * 2 / numBranches) * i + Math.random() * 0.5;
+          const length = (1 - this.depth / this.maxDepth) * (2 + Math.random() * 2);
+
+          const newDir = new THREE.Vector3(
+            Math.cos(angle) * 0.3 + (Math.random() - 0.5) * 0.5,
+            0.8 + Math.random() * 0.4,
+            Math.sin(angle) * 0.3 + (Math.random() - 0.5) * 0.5
+          ).normalize();
+
+          const newEnd = endPoint.clone().add(newDir.multiplyScalar(length));
+
+          const branch = new TimelineBranch(
+            endPoint.clone(),
+            newEnd,
+            this.depth + 1,
+            this,
+            this.scene,
+            this.noise
+          );
+
+          this.children.push(branch);
+        }
+      }
+
+      getTotalBranches() {
+        let count = 1;
+        for (const child of this.children) {
+          count += child.getTotalBranches();
+        }
+        return count;
+      }
+
+      getMaxDepth() {
+        let maxD = this.depth;
+        for (const child of this.children) {
+          maxD = Math.max(maxD, child.getMaxDepth());
+        }
+        return maxD;
+      }
+
+      getNexusCount() {
+        let count = this.isNexus ? 1 : 0;
+        for (const child of this.children) {
+          count += child.getNexusCount();
+        }
+        return count;
+      }
+
+      dispose() {
+        this.scene.remove(this.line);
+        this.scene.remove(this.glowLine);
+        this.line.geometry.dispose();
+        this.line.material.dispose();
+        this.glowLine.geometry.dispose();
+        this.glowLine.material.dispose();
+        for (const child of this.children) {
+          child.dispose();
+        }
+      }
+    }
+
+    class SacredTimeline {
+      constructor() {
+        this.scene = new THREE.Scene();
+        this.camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
+        this.renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+        this.noise = new SimplexNoise(42);
+        this.branches = [];
+        this.mousePos = new THREE.Vector3();
+        this.clock = new THREE.Clock();
+        this.time = 0;
+        this.nexusCount = 0;
+
+        this.init();
+      }
+
+      init() {
+        this.renderer.setSize(window.innerWidth, window.innerHeight);
+        this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        this.renderer.setClearColor(0x000000, 1);
+        document.body.appendChild(this.renderer.domElement);
+
+        this.camera.position.set(0, -8, 12);
+        this.camera.lookAt(0, 5, 0);
+
+        this.setupPostProcessing();
+        this.setupLights();
+        this.createInitialBranches();
+        this.setupEventListeners();
+
+        document.getElementById('loading').style.display = 'none';
+
+        this.animate();
+      }
+
+      setupPostProcessing() {
+        this.composer = new EffectComposer(this.renderer);
+
+        const renderPass = new RenderPass(this.scene, this.camera);
+        this.composer.addPass(renderPass);
+
+        const bloomPass = new UnrealBloomPass(
+          new THREE.Vector2(window.innerWidth, window.innerHeight),
+          1.5,
+          0.4,
+          0.85
+        );
+        bloomPass.threshold = 0;
+        bloomPass.strength = 2.0;
+        bloomPass.radius = 1.0;
+        this.composer.addPass(bloomPass);
+
+        this.bloomPass = bloomPass;
+      }
+
+      setupLights() {
+        const ambientLight = new THREE.AmbientLight(0x111111);
+        this.scene.add(ambientLight);
+
+        const pointLight1 = new THREE.PointLight(AMBER_GOLD, 2, 50);
+        pointLight1.position.set(0, 10, 5);
+        this.scene.add(pointLight1);
+
+        const pointLight2 = new THREE.PointLight(AMBER_ORANGE, 1, 30);
+        pointLight2.position.set(-5, 0, 10);
+        this.scene.add(pointLight2);
+      }
+
+      createInitialBranches() {
+        const numMainBranches = 3 + Math.floor(Math.random() * 3);
+
+        for (let i = 0; i < numMainBranches; i++) {
+          const x = (i - numMainBranches / 2) * 2 + (Math.random() - 0.5);
+          const startPos = new THREE.Vector3(x, -10, (Math.random() - 0.5) * 2);
+          const endPos = new THREE.Vector3(
+            x + (Math.random() - 0.5) * 1.5,
+            8 + Math.random() * 4,
+            (Math.random() - 0.5) * 2
+          );
+
+          const branch = new TimelineBranch(startPos, endPos, 0, null, this.scene, this.noise);
+          this.branches.push(branch);
+        }
+      }
+
+      setupEventListeners() {
+        window.addEventListener('resize', () => this.onResize());
+        window.addEventListener('mousemove', (e) => this.onMouseMove(e));
+        window.addEventListener('touchmove', (e) => this.onTouchMove(e));
+      }
+
+      onResize() {
+        this.camera.aspect = window.innerWidth / window.innerHeight;
+        this.camera.updateProjectionMatrix();
+        this.renderer.setSize(window.innerWidth, window.innerHeight);
+        this.composer.setSize(window.innerWidth, window.innerHeight);
+      }
+
+      onMouseMove(event) {
+        const x = (event.clientX / window.innerWidth) * 2 - 1;
+        const y = -(event.clientY / window.innerHeight) * 2 + 1;
+
+        this.mousePos.set(x * 15, y * 15, 0);
+      }
+
+      onTouchMove(event) {
+        if (event.touches.length > 0) {
+          const touch = event.touches[0];
+          const x = (touch.clientX / window.innerWidth) * 2 - 1;
+          const y = -(touch.clientY / window.innerHeight) * 2 + 1;
+          this.mousePos.set(x * 15, y * 15, 0);
+        }
+      }
+
+      animate() {
+        requestAnimationFrame(() => this.animate());
+
+        const deltaTime = this.clock.getDelta();
+        this.time += deltaTime;
+
+        for (const branch of this.branches) {
+          branch.update(this.time, deltaTime, this.mousePos);
+          branch.createChildBranches();
+        }
+
+        const totalBranches = this.branches.reduce((sum, b) => sum + b.getTotalBranches(), 0);
+        const maxDepth = Math.max(0, ...this.branches.map(b => b.getMaxDepth()));
+        const nexusCount = this.branches.reduce((sum, b) => sum + b.getNexusCount(), 0);
+
+        document.getElementById('branchCount').textContent = totalBranches;
+        document.getElementById('depthCount').textContent = maxDepth;
+        document.getElementById('nexusCount').textContent = nexusCount;
+
+        this.camera.position.y = -8 + Math.sin(this.time * 0.1) * 0.5;
+        this.camera.lookAt(0, 5, 0);
+
+        this.composer.render();
+      }
+    }
+
+    const timeline = new SacredTimeline();
+  </script>
+</body>
+</html>

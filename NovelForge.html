@@ -1,0 +1,2430 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>小说冲突生成器</title>
+  <style>
+
+    :root {
+      --animal-primary-color: #19c8b9;
+      --animal-primary-color-hover: #3dd4c6;
+      --animal-primary-color-active: #11a89b;
+      --animal-primary-color-bg: #e6f9f6;
+      --animal-success-color: #6fba2c;
+      --animal-warning-color: #f5c31c;
+      --animal-error-color: #e05a5a;
+      --animal-text-color: #794f27;
+      --animal-text-color-secondary: #9f927d;
+      --animal-border-color: #e8dcc8;
+      --animal-bg-color: #f8f8f0;
+      --animal-bg-color-secondary: #f0e8d8;
+      --animal-card-color: #f7f3df;
+      --animal-dark: #4c3c33;
+      --animal-blue: #b7c6e5;
+      --animal-pink: #f8a6b2;
+      --animal-purple: #b77dee;
+      --animal-yellow: #f7cd67;
+      --animal-teal: #82d5bb;
+      --animal-green: #7dc395;
+      --animal-radius-sm: 12px;
+      --animal-radius-md: 18px;
+      --animal-radius-lg: 24px;
+      --animal-shadow-sm: 0 2px 4px rgba(61, 52, 40, 0.06);
+      --animal-shadow: 0 3px 10px rgba(61, 52, 40, 0.10);
+      --animal-shadow-lg: 0 8px 24px rgba(61, 52, 40, 0.14);
+      --animal-font: Nunito, "Noto Sans SC", "Zen Maru Gothic", "HarmonyOS Sans SC", -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
+    }
+
+    * { box-sizing: border-box; }
+
+    ::selection {
+      color: #fff9e6;
+      background: var(--animal-primary-color);
+    }
+
+    html {
+      scroll-behavior: smooth;
+      scrollbar-color: rgba(121, 79, 39, 0.34) rgba(255, 249, 230, 0.4);
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      color: var(--animal-text-color);
+      font-family: var(--animal-font);
+      font-size: 14px;
+      line-height: 1.58;
+      background:
+        linear-gradient(rgba(255, 249, 230, 0.18), rgba(255, 249, 230, 0.18)),
+        var(--animal-green);
+      overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+      opacity: 0.16;
+      background-image: url("data:image/svg+xml,%3Csvg width='180' height='180' viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' stroke='%2364b582' stroke-width='7' stroke-linecap='round'%3E%3Cpath d='M58 128C25 94 31 45 76 22c32 34 30 78-18 106Z'/%3E%3Cpath d='M75 27c-1 26-7 59-27 91M63 54c14 4 27 13 38 25M55 77c15 4 28 13 39 25M47 99c15 5 29 14 39 26'/%3E%3Cpath d='M126 75c18-18 16-43-8-56-16 18-15 42 8 56Z'/%3E%3Cpath d='M118 21c1 14 4 30 14 45M124 37c-8 2-15 7-21 13M129 50c-7 2-14 7-20 13'/%3E%3C/g%3E%3C/svg%3E");
+      background-size: 180px 180px;
+      animation: animalPattern 24s linear infinite;
+    }
+
+    @keyframes animalPattern {
+      from { background-position: 0 0; }
+      to { background-position: 180px 180px; }
+    }
+
+    button,
+    input,
+    textarea,
+    select {
+      font: inherit;
+    }
+
+    button {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      min-height: 45px;
+      padding: 0 20px;
+      border: 2px solid var(--animal-bg-color);
+      border-radius: 50px;
+      color: var(--animal-text-color);
+      background: var(--animal-bg-color);
+      box-shadow: 0 5px 0 #bdaea0;
+      cursor: pointer;
+      font-weight: 900;
+      line-height: 1;
+      letter-spacing: 0.02em;
+      transition: transform 160ms ease, box-shadow 160ms ease, background 160ms ease;
+      user-select: none;
+    }
+
+    button:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 6px 0 #bdaea0;
+    }
+
+    button:active {
+      transform: translateY(2px);
+      box-shadow: 0 1px 0 #bdaea0;
+    }
+
+    button:focus-visible,
+    input:focus-visible,
+    textarea:focus-visible,
+    select:focus-visible,
+    a:focus-visible {
+      outline: 3px solid rgba(25, 200, 185, 0.36);
+      outline-offset: 2px;
+    }
+
+    #generate {
+      color: #ffffff;
+      background: var(--animal-primary-color);
+      border-color: #4de2da;
+      box-shadow: 0 5px 0 var(--animal-primary-color-active);
+    }
+
+    #generate:hover { box-shadow: 0 6px 0 var(--animal-primary-color-active); }
+    #generate:active { box-shadow: 0 1px 0 var(--animal-primary-color-active); }
+
+    #clear {
+      color: #ffffff;
+      background: var(--animal-error-color);
+      border-color: #e87878;
+      box-shadow: 0 5px 0 #c94444;
+    }
+
+    #clear:hover { box-shadow: 0 6px 0 #c94444; }
+    #clear:active { box-shadow: 0 1px 0 #c94444; }
+
+    .secondary {
+      width: 100%;
+      color: var(--animal-text-color);
+      background: var(--animal-bg-color);
+      border-color: var(--animal-border-color);
+    }
+
+    .icon {
+      width: 45px;
+      min-width: 45px;
+      padding: 0;
+      border-radius: 50%;
+      font-size: 16px;
+    }
+
+    .app {
+      position: relative;
+      z-index: 1;
+      width: 100%;
+      min-height: 100vh;
+      display: grid;
+      grid-template-columns: 220px minmax(0, 1fr);
+      grid-template-rows: auto 1fr;
+    }
+
+    .side-rail {
+      position: sticky;
+      top: 0;
+      grid-row: 1 / span 2;
+      min-height: 100vh;
+      padding: 20px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      background:
+        linear-gradient(90deg, rgba(255, 249, 230, 0.94), rgba(248, 243, 225, 0.9)),
+        repeating-linear-gradient(0deg, rgba(121, 79, 39, 0.045) 0 1px, transparent 1px 18px);
+      border-right: 2px solid rgba(121, 79, 39, 0.12);
+      box-shadow: 8px 0 24px rgba(61, 52, 40, 0.08);
+      z-index: 10;
+    }
+
+    .brand-mark {
+      min-height: 56px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: #725d42;
+      font-size: 15px;
+      font-weight: 900;
+      letter-spacing: -0.02em;
+    }
+
+    .brand-mark::before {
+      content: "✦";
+      width: 36px;
+      height: 36px;
+      display: grid;
+      place-items: center;
+      color: var(--animal-dark);
+      background: var(--animal-warning-color);
+      border-radius: 14px 18px 13px 20px / 17px 14px 20px 12px;
+      box-shadow: 0 5px 0 #bdaea0;
+      font-size: 18px;
+    }
+
+    .rail-group {
+      display: grid;
+      gap: 6px;
+      padding: 8px 0;
+    }
+
+    .side-rail > div:nth-child(3) {
+      flex: 1;
+    }
+
+    .rail-button {
+      width: 100%;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      padding: 0 16px 0 24px;
+      border-radius: 12px;
+      color: #8a7b66;
+      text-decoration: none;
+      font-size: 0;
+      font-weight: 900;
+      transition: transform 150ms ease, background 150ms ease, color 150ms ease;
+    }
+
+    .rail-button::after { font-size: 14px; }
+    .rail-button:nth-child(1)::after { content: "生成器"; }
+    .rail-button:nth-child(2)::after { content: "想法池"; }
+    .rail-button:nth-child(3)::after { content: "逻辑链"; }
+    .rail-button:nth-child(4)::after { content: "时间线"; }
+    .side-rail .rail-group:last-child .rail-button:nth-child(1)::after { content: "历史"; }
+    .side-rail .rail-group:last-child .rail-button:nth-child(2)::after { content: "趋势"; }
+
+    .rail-button:hover {
+      color: #725d42;
+      background: #d6dff0;
+      transform: translateX(2px);
+    }
+
+    .rail-button.is-active {
+      color: #ffffff;
+      background: var(--animal-blue);
+    }
+
+    header {
+      position: relative;
+      grid-column: 2;
+      min-height: 100vh;
+      padding: 72px clamp(32px, 6vw, 76px) 38px;
+      display: grid;
+      grid-template-columns: minmax(280px, 560px) minmax(240px, 1fr);
+      align-items: center;
+      gap: 42px;
+    }
+
+    .imagine-button {
+      margin-top: 22px;
+      padding: 10px 20px;
+      border: 0;
+      border-radius: 50px;
+      color: var(--animal-text-color);
+      background: var(--animal-bg-color);
+      box-shadow: 0 5px 0 #bdaea0;
+      font-size: 14px;
+      font-weight: 900;
+      cursor: pointer;
+      transition: transform 0.18s ease, box-shadow 0.18s ease, background 0.18s ease;
+    }
+
+    .imagine-button:hover,
+    .imagine-button:focus-visible {
+      background: #fffaf0;
+      transform: translateY(-3px);
+      box-shadow: 0 8px 0 #bdaea0;
+      outline: none;
+    }
+
+    .imagine-button:active {
+      transform: translateY(2px);
+      box-shadow: 0 2px 0 #bdaea0;
+    }
+
+    .hero-illustration {
+      position: relative;
+      justify-self: center;
+      width: min(390px, 32vw);
+      aspect-ratio: 1;
+      transform: rotate(2deg);
+      filter: drop-shadow(0 18px 0 rgba(61, 52, 40, 0.10));
+      animation: islandFloat 5.8s ease-in-out infinite;
+    }
+
+    .hero-character {
+      display: block;
+      width: min(240px, 72%);
+      height: auto;
+      margin: 0 auto;
+      object-fit: contain;
+      transition: transform 0.24s ease;
+    }
+
+    .hero-illustration:hover .hero-character,
+    .hero-illustration:focus-within .hero-character {
+      transform: rotate(-2deg) scale(1.035);
+    }
+
+    .inspiration-bubbles {
+      position: absolute;
+      inset: -20px -36px;
+      pointer-events: none;
+    }
+
+    .inspiration-bubble {
+      position: absolute;
+      min-height: 36px;
+      padding: 0 14px;
+      border: 2px solid #e0d2bd;
+      border-radius: 999px;
+      color: #725d42;
+      background: #fffaf0;
+      box-shadow: 0 5px 0 #bdaea0;
+      font-family: inherit;
+      font-size: 13px;
+      font-weight: 900;
+      cursor: pointer;
+      opacity: 0;
+      transform: translateY(12px) scale(0.94);
+      transition: opacity 0.22s ease, transform 0.22s ease, box-shadow 0.18s ease;
+      pointer-events: auto;
+    }
+
+    .inspiration-bubble:nth-child(1) {
+      top: 16%;
+      left: -8%;
+      transition-delay: 0.02s;
+    }
+
+    .inspiration-bubble:nth-child(2) {
+      top: 4%;
+      right: 0;
+      transition-delay: 0.08s;
+    }
+
+    .inspiration-bubble:nth-child(3) {
+      right: -8%;
+      bottom: 18%;
+      transition-delay: 0.14s;
+    }
+
+    .inspiration-bubble:nth-child(4) {
+      left: 4%;
+      bottom: 5%;
+      transition-delay: 0.20s;
+    }
+
+    .inspiration-bubble:nth-child(5) {
+      top: 38%;
+      left: -18%;
+      transition-delay: 0.26s;
+    }
+
+    .inspiration-bubble:nth-child(6) {
+      top: 34%;
+      right: -20%;
+      transition-delay: 0.32s;
+    }
+
+    .inspiration-bubble:nth-child(7) {
+      left: 28%;
+      bottom: -7%;
+      transition-delay: 0.38s;
+    }
+
+    .inspiration-bubble:nth-child(8) {
+      top: -8%;
+      left: 34%;
+      transition-delay: 0.44s;
+    }
+
+    .hero-illustration:hover .inspiration-bubble,
+    .hero-illustration:focus-within .inspiration-bubble {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+
+    .inspiration-bubble:hover,
+    .inspiration-bubble:focus-visible {
+      outline: none;
+      transform: translateY(-3px) scale(1.03);
+      box-shadow: 0 8px 0 #bdaea0;
+      background: #fffdf7;
+    }
+
+    .keywords-pulse {
+      animation: keywordPulse 1.2s ease;
+    }
+
+    @keyframes keywordPulse {
+      0%, 100% { box-shadow: inset 0 0 0 0 rgba(25, 200, 185, 0); }
+      25% { box-shadow: inset 0 0 0 4px rgba(25, 200, 185, 0.18), 0 0 0 5px rgba(25, 200, 185, 0.16); }
+      60% { box-shadow: inset 0 0 0 2px rgba(25, 200, 185, 0.10), 0 0 0 10px rgba(25, 200, 185, 0); }
+    }
+
+    @keyframes islandFloat {
+      0%, 100% { transform: translateY(0) rotate(2deg); }
+      50% { transform: translateY(-10px) rotate(-1deg); }
+    }
+
+    h1 {
+      margin: 0;
+      color: #fff9e6;
+      font-size: clamp(48px, 7vw, 88px);
+      line-height: 0.95;
+      font-weight: 900;
+      letter-spacing: -0.035em;
+      text-shadow: 0 5px 1px rgba(61, 52, 40, 0.4);
+    }
+
+    .subtitle {
+      max-width: 520px;
+      margin: 24px 0 0;
+      color: #7c5734;
+      font-size: 17px;
+      line-height: 1.75;
+      font-weight: 800;
+    }
+
+    .top-actions {
+      position: absolute;
+      top: 28px;
+      right: clamp(24px, 5vw, 64px);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .top-search,
+    .status {
+      min-height: 44px;
+      display: flex;
+      align-items: center;
+      border: 2px solid var(--animal-bg-color);
+      border-radius: 50px;
+      color: var(--animal-text-color);
+      background: rgba(248, 248, 240, 0.94);
+      box-shadow: 0 5px 0 #bdaea0;
+      font-weight: 900;
+      white-space: nowrap;
+    }
+
+    .top-search {
+      width: 230px;
+      gap: 10px;
+      padding: 0 18px;
+      color: var(--animal-text-color-secondary);
+    }
+
+    .top-search::before {
+      content: "";
+      width: 14px;
+      height: 14px;
+      border: 2px solid var(--animal-text-color);
+      border-radius: 50%;
+      box-shadow: 6px 6px 0 -4px var(--animal-text-color);
+    }
+
+    .status {
+      display: grid;
+      place-items: center;
+      padding: 0 18px;
+      font-size: 12px;
+    }
+
+    .status span:first-child,
+    .status-dot {
+      display: none;
+    }
+
+    main {
+      grid-column: 2;
+      display: grid;
+      grid-template-columns: minmax(280px, 350px) minmax(0, 1fr);
+      gap: 24px;
+      padding: 0 clamp(24px, 5vw, 56px) 92px;
+      align-items: start;
+    }
+
+    .panel,
+    .card,
+    .metric,
+    .branch-card,
+    .timeline-card,
+    .choice-card,
+    .logic div,
+    .timeline {
+      border: 0;
+      border-radius: 24px 20px 28px 22px / 22px 28px 20px 24px;
+      background: var(--animal-card-color);
+      color: #725d42;
+      box-shadow: var(--animal-shadow-lg);
+      transition: transform 180ms ease, box-shadow 180ms ease;
+    }
+
+    .panel:not(.history-panel):not(.trends-panel):hover,
+    .card:hover,
+    .branch-card:hover,
+    .timeline-card:hover,
+    .choice-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 28px rgba(61, 52, 40, 0.16);
+    }
+
+    .control {
+      position: sticky;
+      top: 22px;
+      max-height: calc(100vh - 44px);
+      overflow: auto;
+      padding: 22px;
+      background: var(--animal-bg-color);
+      border-radius: 26px 22px 32px 24px / 24px 32px 22px 26px;
+    }
+
+    .stack {
+      display: grid;
+      gap: 16px;
+    }
+
+    label {
+      display: grid;
+      gap: 8px;
+      color: #725d42;
+      font-size: 13px;
+      font-weight: 900;
+    }
+
+    .row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    input,
+    textarea,
+    select {
+      width: 100%;
+      border: 2px solid var(--animal-border-color);
+      border-radius: 18px 15px 20px 16px / 16px 20px 15px 18px;
+      background: #faf8f2;
+      color: #725d42;
+      padding: 11px 12px;
+      outline: none;
+      font-weight: 700;
+      box-shadow: inset 0 2px 0 rgba(255, 255, 255, 0.72);
+    }
+
+    textarea {
+      min-height: 86px;
+      resize: vertical;
+    }
+
+    input::placeholder,
+    textarea::placeholder {
+      color: #b4a58f;
+    }
+
+    input:focus,
+    textarea:focus,
+    select:focus {
+      border-color: var(--animal-primary-color);
+      box-shadow: 0 0 0 4px rgba(25, 200, 185, 0.16);
+    }
+
+    .actions {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) repeat(4, 45px);
+      gap: 10px;
+    }
+
+    .workspace {
+      display: grid;
+      grid-template-columns: repeat(12, minmax(0, 1fr));
+      gap: 20px;
+      min-width: 0;
+    }
+
+    .metrics {
+      grid-column: 1 / -1;
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .metric {
+      min-height: 96px;
+      padding: 18px;
+    }
+
+    .metric:nth-child(1) { background: var(--animal-pink); color: #ffffff; }
+    .metric:nth-child(2) { background: var(--animal-teal); color: #ffffff; }
+    .metric:nth-child(3) { background: var(--animal-yellow); color: #725d42; }
+    .metric:nth-child(4) { background: var(--animal-purple); color: #ffffff; }
+
+    .metric b {
+      display: block;
+      color: currentColor;
+      font-size: 34px;
+      line-height: 1;
+      font-weight: 900;
+    }
+
+    .metric span {
+      display: block;
+      margin-top: 8px;
+      color: currentColor;
+      opacity: 0.82;
+      font-weight: 900;
+    }
+
+    .section {
+      padding: 24px;
+    }
+
+    .workspace > .section,
+    .workspace > .timeline-section {
+      grid-column: span 6;
+    }
+
+    .workspace > .section:nth-child(2) {
+      grid-column: span 7;
+      background:
+        radial-gradient(circle at 88% 16%, rgba(25, 200, 185, 0.18), transparent 7rem),
+        var(--animal-card-color);
+    }
+
+    .workspace > .section:nth-child(3) {
+      grid-column: span 5;
+      color: #fff9e6;
+      background: var(--animal-dark);
+    }
+
+    .workspace > .section:nth-child(4) {
+      grid-column: span 5;
+      background: #faf8f2;
+    }
+
+    .workspace > .timeline-section {
+      grid-column: span 7;
+      background: var(--animal-card-color);
+      overflow: hidden;
+    }
+
+    .section-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 16px;
+      margin-bottom: 16px;
+    }
+
+    .section-meta {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+      gap: 10px;
+      align-items: center;
+    }
+
+    h2,
+    h3 {
+      margin: 0;
+      color: currentColor;
+      font-weight: 900;
+      letter-spacing: -0.02em;
+    }
+
+    h2 { font-size: 22px; }
+    h3 { font-size: 28px; color: #725d42; }
+
+    .small {
+      color: currentColor;
+      opacity: 0.72;
+      font-size: 13px;
+      font-weight: 900;
+    }
+
+    .output {
+      min-height: auto;
+      padding: 0;
+      border: 0;
+      background: transparent;
+      box-shadow: none;
+    }
+
+    .output p,
+    .output li {
+      color: #7c5734;
+      font-size: 16px;
+      line-height: 1.8;
+      font-weight: 700;
+    }
+
+    .output b { color: var(--animal-dark); }
+
+    .output ul {
+      margin: 12px 0 0;
+      padding-left: 21px;
+    }
+
+    .output-note {
+      margin-top: 16px;
+      padding: 12px;
+      border: 2px dashed var(--animal-border-color);
+      border-radius: 18px;
+      background: #faf8f2;
+      color: #725d42;
+      font-weight: 700;
+    }
+
+    .cards {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 12px;
+    }
+
+    .card {
+      min-height: auto;
+      padding: 14px;
+      display: grid;
+      grid-template-columns: 1fr auto;
+      grid-template-rows: auto auto;
+      align-items: start;
+      gap: 10px 14px;
+      background: rgba(255, 249, 230, 0.12);
+      box-shadow: none;
+    }
+
+    .card p {
+      grid-column: 1 / -1;
+      margin: 0;
+      color: rgba(255, 249, 230, 0.9);
+      line-height: 1.65;
+      font-weight: 700;
+    }
+
+    .card button {
+      grid-column: 2;
+      grid-row: 1;
+      min-height: 34px;
+      padding: 0 12px;
+      white-space: nowrap;
+      font-size: 12px;
+    }
+
+    .tag {
+      grid-column: 1;
+      grid-row: 1;
+      width: fit-content;
+      padding: 3px 9px;
+      border-radius: 999px;
+      color: #3d5a1a;
+      background: #d1da49;
+      font-size: 12px;
+      font-weight: 900;
+    }
+
+    .logic {
+      display: grid;
+      gap: 12px;
+    }
+
+    .logic div {
+      display: grid;
+      gap: 4px;
+      padding: 12px;
+      border: 2px dashed var(--animal-border-color);
+      background: #faf8f2;
+      box-shadow: none;
+    }
+
+    .logic b,
+    .timeline-card b,
+    .choice-card b {
+      display: block;
+      margin-bottom: 4px;
+      color: #725d42;
+      font-size: 13px;
+      font-weight: 900;
+    }
+
+    .logic span,
+    .timeline-card span,
+    .choice-card span {
+      color: #7c5734;
+      font-size: 14px;
+      line-height: 1.6;
+      font-weight: 700;
+    }
+
+    .timeline {
+      position: relative;
+      isolation: isolate;
+      display: grid;
+      gap: 14px;
+      padding: 18px;
+      overflow: hidden;
+      background: #faf8f2;
+      box-shadow: inset 0 0 0 2px var(--animal-border-color);
+    }
+
+    .timeline-tree {
+      position: relative;
+      z-index: 1;
+      display: grid;
+      gap: 14px;
+      min-width: 0;
+    }
+
+    .timeline-node {
+      display: grid;
+      gap: 12px;
+      min-width: 0;
+    }
+
+    .timeline-branches {
+      position: relative;
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 14px;
+      padding-left: 22px;
+    }
+
+    .timeline-branches::before {
+      content: "";
+      position: absolute;
+      left: 6px;
+      top: 0;
+      bottom: 0;
+      width: 2px;
+      border-radius: 999px;
+      background: rgba(25, 200, 185, 0.28);
+    }
+
+    .timeline-path {
+      position: relative;
+      display: grid;
+      gap: 10px;
+      min-width: 0;
+    }
+
+    .timeline-path::before {
+      content: "";
+      position: absolute;
+      left: -16px;
+      top: 26px;
+      width: 16px;
+      height: 2px;
+      border-radius: 999px;
+      background: rgba(25, 200, 185, 0.32);
+    }
+
+    .timeline-card {
+      padding: 14px;
+      background: var(--animal-card-color);
+      box-shadow: var(--animal-shadow);
+    }
+
+    .choice-card {
+      padding: 14px;
+      background: var(--animal-primary-color-bg);
+      box-shadow: var(--animal-shadow-sm);
+    }
+
+    .timeline-ending {
+      background: #f0e8d8;
+    }
+
+    .timeline-flow {
+      position: absolute;
+      left: 0;
+      top: 0;
+      z-index: 0;
+      pointer-events: none;
+      overflow: visible;
+    }
+
+    .timeline-line {
+      fill: none;
+      stroke: var(--animal-primary-color);
+      stroke-width: 2.4;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      opacity: 0.68;
+      stroke-dasharray: 1000;
+      stroke-dashoffset: 1000;
+      animation: timelineDraw 1.15s ease forwards;
+    }
+
+    .timeline-line.choice-link {
+      stroke: var(--animal-warning-color);
+      stroke-width: 1.5;
+      opacity: 0.72;
+    }
+
+    .timeline-dot {
+      fill: var(--animal-warning-color);
+      opacity: 0.96;
+      transform-box: fill-box;
+      transform-origin: center;
+      animation: timelineDotPulse 1.7s ease-in-out infinite;
+    }
+
+    @keyframes timelineDraw { to { stroke-dashoffset: 0; } }
+    @keyframes timelineDotPulse {
+      0%, 100% { opacity: 0.5; transform: scale(0.9); }
+      50% { opacity: 1; transform: scale(1.22); }
+    }
+
+    .timeline-tools {
+      display: inline-flex;
+      gap: 4px;
+      padding: 4px;
+      border-radius: 50px;
+      background: var(--animal-bg-color-secondary);
+    }
+
+    .mode-button {
+      min-height: 30px;
+      padding: 0 12px;
+      border: 0;
+      color: #725d42;
+      background: transparent;
+      box-shadow: none;
+      font-size: 12px;
+    }
+
+    .mode-button:hover,
+    .mode-button:active {
+      transform: none;
+      box-shadow: none;
+    }
+
+    .mode-button.is-active {
+      color: #ffffff;
+      background: var(--animal-primary-color);
+    }
+
+    .timeline.timeline-horizontal {
+      overflow: auto hidden;
+      padding-bottom: 12px;
+      overscroll-behavior-x: contain;
+    }
+
+    .timeline.timeline-horizontal .timeline-tree {
+      width: max-content;
+      min-width: 100%;
+    }
+
+    .timeline.timeline-horizontal > .timeline-tree > .timeline-node {
+      grid-template-columns: minmax(220px, 280px) 1fr;
+      align-items: start;
+      gap: 36px;
+    }
+
+    .timeline.timeline-horizontal > .timeline-tree > .timeline-node > .timeline-branches {
+      display: flex;
+      align-items: flex-start;
+      gap: 18px;
+      min-width: max-content;
+      padding-left: 0;
+    }
+
+    .timeline.timeline-horizontal > .timeline-tree > .timeline-node > .timeline-branches::before {
+      left: -19px;
+      top: 50%;
+      bottom: auto;
+      width: 18px;
+      height: 2px;
+    }
+
+    .timeline.timeline-horizontal > .timeline-tree > .timeline-node > .timeline-branches > .timeline-path {
+      flex: 0 0 340px;
+    }
+
+    .timeline.timeline-horizontal .timeline-path .timeline-node {
+      grid-template-columns: 1fr;
+      gap: 10px;
+    }
+
+    .timeline.timeline-horizontal .timeline-path .timeline-branches {
+      grid-template-columns: 1fr;
+      padding-left: 18px;
+      gap: 10px;
+    }
+
+    .timeline.timeline-horizontal > .timeline-tree > .timeline-node > .timeline-branches > .timeline-path::before {
+      left: -18px;
+      top: 28px;
+      width: 18px;
+    }
+
+    .branch-card {
+      padding: 12px;
+      background: #faf8f2;
+    }
+
+    .branch-card strong {
+      display: block;
+      margin-top: 8px;
+      font-size: 13px;
+    }
+
+    .history-panel,
+    .trends-panel {
+      position: fixed;
+      top: 0;
+      right: -420px;
+      width: min(420px, 100vw);
+      height: 100vh;
+      z-index: 1000;
+      display: flex;
+      flex-direction: column;
+      background: var(--animal-bg-color);
+      border-radius: 0;
+      box-shadow: -8px 0 24px rgba(61, 52, 40, 0.14);
+      transition: right 220ms ease;
+    }
+
+    .history-panel.open,
+    .trends-panel.open {
+      right: 0;
+    }
+
+    .panel-header {
+      padding: 18px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 2px dashed var(--animal-border-color);
+    }
+
+    .panel-header h3 {
+      color: #725d42;
+      font-size: 20px;
+      font-weight: 900;
+    }
+
+    .panel-content {
+      flex: 1;
+      padding: 18px;
+      overflow: auto;
+    }
+
+    .history-search {
+      margin-bottom: 16px;
+      display: flex;
+      gap: 10px;
+    }
+
+    .history-search input {
+      flex: 1;
+    }
+
+    .history-list,
+    .trends-content {
+      display: grid;
+      gap: 12px;
+    }
+
+    .history-item,
+    .trend-section,
+    .prediction {
+      padding: 14px;
+      border: 2px solid var(--animal-border-color);
+      border-radius: 20px;
+      background: #faf8f2;
+      color: #725d42;
+    }
+
+    .history-item {
+      cursor: pointer;
+    }
+
+    .history-item:hover {
+      border-color: var(--animal-primary-color);
+    }
+
+    .history-item h4,
+    .trend-section h4 {
+      margin: 0 0 8px;
+      color: #725d42;
+      font-size: 14px;
+      font-weight: 900;
+    }
+
+    .history-item p,
+    .history-item .meta,
+    .trend-item,
+    .prediction {
+      margin: 0 0 5px;
+      color: #7c5734;
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .trend-item {
+      display: flex;
+      justify-content: space-between;
+      padding: 4px 0;
+      border-bottom: 1px dashed var(--animal-border-color);
+    }
+
+    .trend-item:last-child {
+      border-bottom: 0;
+    }
+
+    .toast {
+      position: fixed;
+      left: 50%;
+      bottom: 24px;
+      z-index: 1200;
+      transform: translateX(-50%) translateY(16px);
+      opacity: 0;
+      padding: 11px 18px;
+      border: 2px solid var(--animal-border-color);
+      border-radius: 50px;
+      color: var(--animal-text-color);
+      background: var(--animal-bg-color);
+      box-shadow: 0 5px 0 #bdaea0;
+      pointer-events: none;
+      transition: opacity 160ms ease, transform 160ms ease;
+      font-weight: 900;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    @media (max-width: 1120px) {
+      .app {
+        grid-template-columns: 1fr;
+      }
+
+      .side-rail {
+        position: relative;
+        min-height: auto;
+        grid-row: auto;
+        display: grid;
+        grid-template-columns: auto 1fr auto;
+        align-items: center;
+      }
+
+      .side-rail > div:nth-child(3) { display: none; }
+
+      .rail-group {
+        display: flex;
+        flex-wrap: wrap;
+      }
+
+      header,
+      main {
+        grid-column: 1;
+      }
+
+      header {
+        min-height: 520px;
+        grid-template-columns: 1fr;
+      }
+
+      .hero-illustration {
+        display: none;
+      }
+
+      main {
+        grid-template-columns: 1fr;
+      }
+
+      .control {
+        position: static;
+        max-height: none;
+      }
+
+      .workspace > .section,
+      .workspace > .section:nth-child(2),
+      .workspace > .section:nth-child(3),
+      .workspace > .section:nth-child(4),
+      .workspace > .timeline-section {
+        grid-column: 1 / -1;
+      }
+    }
+
+    @media (max-width: 720px) {
+      .side-rail {
+        display: none;
+      }
+
+      header {
+        min-height: 460px;
+        padding: 72px 20px 28px;
+      }
+
+      h1 {
+        font-size: clamp(40px, 16vw, 58px);
+      }
+
+      .top-actions {
+        left: 16px;
+        right: 16px;
+      }
+
+      .top-search {
+        display: none;
+      }
+
+      .status {
+        width: 100%;
+      }
+
+      main {
+        padding: 0 16px 48px;
+      }
+
+      .row,
+      .metrics,
+      .workspace {
+        grid-template-columns: 1fr;
+      }
+
+      .actions {
+        grid-template-columns: minmax(0, 1fr) repeat(4, 40px);
+      }
+
+      .icon {
+        width: 40px;
+        min-width: 40px;
+      }
+
+      .section-head,
+      .section-meta {
+        display: grid;
+        justify-content: stretch;
+      }
+
+      .timeline.timeline-horizontal .timeline-tree {
+        min-width: 640px;
+      }
+
+      .timeline.timeline-horizontal > .timeline-tree > .timeline-node {
+        grid-template-columns: minmax(190px, 220px) 1fr;
+        gap: 24px;
+      }
+
+      .timeline.timeline-horizontal > .timeline-tree > .timeline-node > .timeline-branches > .timeline-path {
+        flex-basis: 300px;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      *, *::before, *::after {
+        animation-duration: 0.001ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.001ms !important;
+      }
+    }
+
+  </style>
+</head>
+<body>
+  <div class="app" id="app">
+    <nav class="side-rail" aria-label="应用导航">
+      <a class="brand-mark" href="#top" aria-label="回到顶部">NF</a>
+      <div class="rail-group" aria-label="主要区域">
+        <a class="rail-button is-active" href="#generator" aria-label="生成器">⌂</a>
+        <a class="rail-button" href="#ideas-section" aria-label="想法池">✦</a>
+        <a class="rail-button" href="#logic-section" aria-label="逻辑链">⌁</a>
+        <a class="rail-button" href="#timeline-section" aria-label="时间线">◎</a>
+      </div>
+      <div class="rail-spacer"></div>
+      <div class="rail-group" aria-label="辅助面板">
+        <button class="rail-button" id="history-toggle" type="button" aria-label="历史记录">↺</button>
+        <button class="rail-button" id="trends-toggle" type="button" aria-label="趋势分析">⚙</button>
+      </div>
+    </nav>
+
+    <header class="hero" id="top">
+      <div>
+        <p class="eyebrow">Novel Forge</p>
+        <h1>小说冲突生成器</h1>
+        <p class="subtitle">输入关键词，整理想法，生成逻辑链，并把源头事件推演成多条可阅读的分支结局。</p>
+        <button class="imagine-button" id="imagine-start" type="button">开始想象</button>
+      </div>
+      <div class="hero-illustration" aria-label="西施惠灵感插图，悬停可选择灵感词">
+        <img class="hero-character" src="Isabelle_AF.png" alt="西施惠">
+        <div class="inspiration-bubbles" id="inspiration-bubbles" aria-label="快速灵感词">
+          <button class="inspiration-bubble" type="button" data-inspiration="雨夜车站">雨夜车站</button>
+          <button class="inspiration-bubble" type="button" data-inspiration="会说谎的朋友">会说谎的朋友</button>
+          <button class="inspiration-bubble" type="button" data-inspiration="旧灯塔">旧灯塔</button>
+        </div>
+      </div>
+      <div class="top-actions">
+        <div class="top-search" aria-hidden="true">Search story data</div>
+        <div class="status">
+          <span><i class="status-dot"></i>离线可用，内容只保存在本机浏览器</span>
+          <span id="savedAt">尚未生成</span>
+        </div>
+      </div>
+    </header>
+
+    <main id="generator">
+      <aside class="panel control" aria-label="故事输入">
+        <form class="stack" id="story-form">
+          <label>
+            关键词
+            <textarea id="keywords" placeholder="例如：海边小镇、失忆医生、旧灯塔、禁忌实验"></textarea>
+          </label>
+
+          <div class="row">
+            <label>
+              类型
+              <select id="genre">
+                <option>悬疑</option>
+                <option>奇幻</option>
+                <option>科幻</option>
+                <option>都市</option>
+                <option>爱情</option>
+                <option>历史</option>
+                <option>武侠</option>
+                <option>恐怖</option>
+              </select>
+            </label>
+            <label>
+              强度
+              <select id="intensity">
+                <option>克制</option>
+                <option selected>紧张</option>
+                <option>高压</option>
+                <option>疯狂</option>
+              </select>
+            </label>
+          </div>
+
+          <div class="row">
+            <label>
+              主角身份
+              <input id="hero" placeholder="例如：新来的档案员">
+            </label>
+            <label>
+              叙事焦点
+              <select id="focus">
+                <option>人物关系</option>
+                <option selected>秘密揭露</option>
+                <option>道德选择</option>
+                <option>生存危机</option>
+                <option>权力斗争</option>
+              </select>
+            </label>
+          </div>
+
+          <label>
+            已有想法
+            <textarea id="seedIdea" placeholder="可选：写下你已有的设定、人物或结局方向"></textarea>
+          </label>
+
+          <div class="actions" aria-label="生成操作">
+            <button id="generate" type="submit">生成冲突</button>
+            <button class="icon" id="randomize" type="button" title="随机补全">↻</button>
+            <button class="icon" id="clear" type="button" title="清空">×</button>
+            <button class="icon" id="copy" type="button" title="复制当前结果">⧉</button>
+            <button class="icon" id="download" type="button" title="导出文本">↓</button>
+          </div>
+
+          <button class="secondary" id="branch" type="button">重生成分支时间线</button>
+        </form>
+      </aside>
+
+      <section class="workspace" aria-label="生成结果">
+        <div class="metrics" aria-label="生成统计">
+          <div class="panel metric"><b id="ideaCount">0</b><span>想法种子</span></div>
+          <div class="panel metric"><b id="brainCount">0</b><span>头脑风暴角度</span></div>
+          <div class="panel metric"><b id="twistCount">0</b><span>可用反转</span></div>
+          <div class="panel metric"><b id="conflictScore">0</b><span>冲突张力</span></div>
+        </div>
+
+        <section class="panel section" id="output-section">
+          <div class="section-head">
+            <h2>情节冲突</h2>
+            <span class="small">每次生成都会重组逻辑链</span>
+          </div>
+          <article class="output" id="output">
+            <h3>等一个关键词</h3>
+            <p>先输入几个词，比如人物、地点、物件、秘密或情绪。这个工具会把散点推成冲突。</p>
+          </article>
+        </section>
+
+        <section class="panel section" id="ideas-section">
+          <div class="section-head">
+            <h2>想法池</h2>
+            <span class="small">点击卡片可加入“已有想法”</span>
+          </div>
+          <div class="cards" id="ideas"></div>
+        </section>
+
+        <section class="panel section" id="logic-section">
+          <div class="section-head">
+            <h2>逻辑链</h2>
+            <span class="small">欲望、阻碍、代价、秘密、反转</span>
+          </div>
+          <aside class="logic" id="logic"></aside>
+        </section>
+
+        <section class="panel section timeline-section" id="timeline-section">
+          <div class="section-head">
+            <h2>分支时间线</h2>
+            <div class="section-meta">
+              <span class="small">同一源头，不同选择，不同后果</span>
+              <div class="timeline-tools" role="group" aria-label="分支时间线布局">
+                <button type="button" class="mode-button is-active" data-timeline-layout="vertical">纵向</button>
+                <button type="button" class="mode-button" data-timeline-layout="horizontal">横向</button>
+              </div>
+            </div>
+          </div>
+          <div class="timeline timeline-vertical" id="timeline">
+            <svg class="timeline-flow" id="timelineFlow" aria-hidden="true"></svg>
+            <div class="timeline-card">
+              <b>节点 1：源头事件</b>
+              <span>生成冲突后，这里会展开多条可能的结局线。</span>
+            </div>
+          </div>
+        </section>
+      </section>
+    </main>
+  </div>
+
+  <aside class="panel history-panel" id="history-panel" aria-label="历史记录" aria-hidden="true">
+    <div class="panel-header">
+      <h3>历史记录</h3>
+      <button class="icon close-panel" type="button" data-panel="history-panel" aria-label="关闭历史记录">×</button>
+    </div>
+    <div class="panel-content">
+      <div class="history-search">
+        <input type="search" id="history-search" placeholder="搜索历史记录">
+        <button id="clear-history" type="button">清空历史</button>
+      </div>
+      <div class="history-list" id="history-list"></div>
+    </div>
+  </aside>
+
+  <aside class="panel trends-panel" id="trends-panel" aria-label="趋势分析" aria-hidden="true">
+    <div class="panel-header">
+      <h3>趋势分析</h3>
+      <button class="icon close-panel" type="button" data-panel="trends-panel" aria-label="关闭趋势分析">×</button>
+    </div>
+    <div class="panel-content">
+      <div class="trends-content" id="trends-content"></div>
+    </div>
+  </aside>
+
+  <div class="toast" id="toast" role="status" aria-live="polite">已完成</div>
+
+  <script>
+    (function () {
+      "use strict";
+
+      var storageKeys = {
+        state: "novelForgeStateV2",
+        history: "novelForgeHistoryV2",
+        inspiration: "novelForgeInspirationPoolV1"
+      };
+
+      var defaultInspirationPool = ["雨夜车站", "会说谎的朋友", "旧灯塔"];
+
+      var bank = {
+        desire: ["证明自己没有疯", "夺回被偷走的人生", "保护唯一知道真相的人", "完成一个不该完成的承诺", "让死者的名誉重见天日", "逃离被安排好的命运"],
+        obstacle: ["最可信的人正在篡改证据", "规则本身就是陷阱", "每次接近答案都会伤害无辜者", "主角的记忆缺了一块关键拼图", "反派掌握了主角最想隐藏的事", "所有线索都指向主角本人"],
+        cost: ["必须背叛一位盟友", "会失去回家的机会", "真相将毁掉受害者最后的尊严", "必须承认自己曾经参与其中", "会让城镇陷入更大的恐慌", "要牺牲一个珍贵的谎言"],
+        secret: ["旧事件其实从未结束", "受害者主动制造了案发现场", "主角一直被当作实验样本观察", "传说是某个组织的加密记录", "真正的敌人藏在求救者之中", "遗物不是证据，而是一把钥匙"],
+        twist: ["救人方法和杀人方法完全相同", "反派说的每句话都是真的，但顺序被调换了", "主角赢下冲突后才发现自己完成了对方计划", "被保护的人才是危机源头", "所谓背叛是为了阻止更早的背叛", "结局需要主角亲手销毁唯一证据"],
+        genre: {
+          "悬疑": ["错位证词", "封闭空间", "迟来的录音", "双重身份"],
+          "奇幻": ["失控契约", "被禁止的神名", "会说谎的预言", "血脉代价"],
+          "科幻": ["人格备份", "时间回滚漏洞", "仿生证人", "殖民地断联"],
+          "都市": ["舆论反噬", "阶层错位", "公司黑箱", "亲密关系勒索"],
+          "爱情": ["隐瞒的旧约", "误认的牺牲", "彼此保护造成的伤害", "无法公开的身份"],
+          "历史": ["伪造诏书", "家族旧案", "边境密信", "史官删去的一页"],
+          "武侠": ["失传心法", "师门血债", "名门伪善", "江湖盟约"],
+          "恐怖": ["重复梦境", "借尸还愿", "消失房间", "被供奉的名字"]
+        },
+        samples: [
+          ["雨夜车站", "离家少女", "无人认领的箱子", "错过的末班车"],
+          ["废弃剧院", "替身演员", "烧毁的剧本", "掌声从空座位传来"],
+          ["雪山旅馆", "失踪向导", "同一张合照", "窗外多出的脚印"],
+          ["地下诊所", "欠债医生", "匿名病历", "无法死亡的患者"]
+        ],
+        heroes: ["新来的档案员", "欠债医生", "替身演员", "守夜人", "失忆记者", "离职侦探", "年轻史官", "走投无路的律师"],
+        nodes: ["第一次隐瞒真相", "是否相信盟友", "是否公开证据", "是否追查源头", "是否牺牲关系", "是否接受交易", "是否回到原点"],
+        choices: [["坦白一部分", "继续隐瞒"], ["保护当事人", "保护证据"], ["立刻行动", "等待更多线索"], ["相信直觉", "相信规则"], ["切断关系", "加深同盟"], ["放弃真相", "追到底"], ["独自承担", "拉所有人下水"]],
+        consequences: ["短期危机被压住，但新的怀疑开始扩散", "主角赢得信任，却失去一个关键证据", "反派提前察觉，改变了原本的计划", "无辜者被卷入，主角不得不改写目标", "线索变得清晰，但代价落到最亲近的人身上", "故事从外部冲突转向主角的自我审判", "旧秘密被证明只是更大秘密的外壳"],
+        endings: ["主角保住了想守护的人，但必须永远背负未公开的真相", "真相公开，所有人都得救，唯独主角再也无法回到原来的生活", "反派失败，却留下一个会在续篇爆发的新规则", "主角赢得表面胜利，随后发现自己成为下一轮冲突的源头", "最坏的结局被避免，但一段重要关系彻底断裂", "故事以和解收束，但读者知道关键证据仍在暗处"]
+      };
+
+      var engineBank = {
+        keywordTypes: [
+          { type: "地点", tests: ["镇", "城", "村", "站", "馆", "塔", "岛", "院", "街", "河", "山", "海", "剧院", "诊所", "旅馆"] },
+          { type: "人物", tests: ["医生", "少女", "骑士", "演员", "记者", "侦探", "史官", "律师", "向导", "病人", "档案员"] },
+          { type: "物件", tests: ["箱", "书", "灯", "病历", "合照", "录音", "钥匙", "戒指", "剧本", "证据", "信"] },
+          { type: "秘密", tests: ["秘密", "禁忌", "匿名", "失踪", "旧事", "诅咒", "实验", "预言", "谎言"] },
+          { type: "危机", tests: ["死亡", "烧毁", "追杀", "断联", "恐慌", "背叛", "债", "血", "无人"] }
+        ],
+        grammar: [
+          { stage: "source", label: "源头", connector: "因为" },
+          { stage: "desire", label: "欲望", connector: "所以" },
+          { stage: "obstacle", label: "阻碍", connector: "但是" },
+          { stage: "action", label: "行动", connector: "于是" },
+          { stage: "consequence", label: "后果", connector: "导致" },
+          { stage: "cost", label: "代价", connector: "代价是" },
+          { stage: "reveal", label: "揭示", connector: "随后发现" },
+          { stage: "twist", label: "反转", connector: "真正反转是" },
+          { stage: "ending", label: "结局状态", connector: "最后" }
+        ],
+        desire: [
+          { text: "证明自己没有疯", focus: ["秘密揭露", "道德选择"], genres: ["悬疑", "恐怖", "科幻"], types: ["秘密"], weight: 8 },
+          { text: "保护唯一知道真相的人", focus: ["人物关系", "生存危机"], genres: ["悬疑", "都市", "爱情"], types: ["人物", "秘密"], weight: 9 },
+          { text: "夺回被偷走的人生", focus: ["权力斗争", "道德选择"], genres: ["都市", "科幻", "历史"], types: ["人物"], weight: 7 },
+          { text: "完成一个不该完成的承诺", focus: ["人物关系", "道德选择"], genres: ["爱情", "武侠", "奇幻"], types: ["物件", "秘密"], weight: 6 },
+          { text: "让死者的名誉重见天日", focus: ["秘密揭露", "权力斗争"], genres: ["历史", "悬疑", "武侠"], types: ["物件"], weight: 7 },
+          { text: "逃离被安排好的命运", focus: ["生存危机", "权力斗争"], genres: ["奇幻", "科幻", "恐怖"], types: ["危机"], weight: 8 }
+        ],
+        obstacle: [
+          { text: "最可信的人正在篡改证据", focus: ["人物关系", "秘密揭露"], genres: ["悬疑", "都市"], types: ["物件", "秘密"], weight: 10 },
+          { text: "规则本身就是陷阱", focus: ["权力斗争", "道德选择"], genres: ["科幻", "奇幻", "历史"], types: ["秘密"], weight: 8 },
+          { text: "每次接近答案都会伤害无辜者", focus: ["道德选择", "生存危机"], genres: ["悬疑", "恐怖", "武侠"], types: ["危机"], weight: 8 },
+          { text: "主角的记忆缺了一块关键拼图", focus: ["秘密揭露"], genres: ["科幻", "悬疑", "恐怖"], types: ["人物"], weight: 7 },
+          { text: "反派掌握了主角最想隐藏的事", focus: ["人物关系", "权力斗争"], genres: ["都市", "爱情", "历史"], types: ["秘密"], weight: 7 },
+          { text: "所有线索都指向主角本人", focus: ["秘密揭露", "道德选择"], genres: ["悬疑", "恐怖"], types: ["物件", "危机"], weight: 9 }
+        ],
+        action: [
+          { text: "公开一部分线索，保留最危险的证据", focus: ["秘密揭露", "权力斗争"], intensity: ["紧张", "高压"], weight: 8 },
+          { text: "把盟友推到安全距离之外，独自追查源头", focus: ["人物关系", "生存危机"], intensity: ["紧张", "高压", "疯狂"], weight: 7 },
+          { text: "假装接受对方规则，暗中调换关键物件", focus: ["权力斗争", "秘密揭露"], intensity: ["克制", "紧张"], weight: 8 },
+          { text: "牺牲一个小真相，换取进入核心现场的机会", focus: ["道德选择", "秘密揭露"], intensity: ["高压", "疯狂"], weight: 9 },
+          { text: "主动成为诱饵，迫使隐藏者提前行动", focus: ["生存危机", "人物关系"], intensity: ["高压", "疯狂"], weight: 8 },
+          { text: "回到一切开始的地点，重新验证第一个证词", focus: ["秘密揭露"], intensity: ["克制", "紧张"], weight: 7 }
+        ],
+        consequence: [
+          { text: "短期危机被压住，但新的怀疑开始扩散", focus: ["秘密揭露"], intensity: ["克制", "紧张"], weight: 8 },
+          { text: "主角赢得信任，却失去一个关键证据", focus: ["人物关系", "秘密揭露"], intensity: ["紧张", "高压"], weight: 9 },
+          { text: "反派提前察觉，改变了原本的计划", focus: ["权力斗争", "生存危机"], intensity: ["紧张", "高压"], weight: 8 },
+          { text: "无辜者被卷入，主角不得不改写目标", focus: ["道德选择", "生存危机"], intensity: ["高压", "疯狂"], weight: 9 },
+          { text: "线索变得清晰，但代价落到最亲近的人身上", focus: ["人物关系", "道德选择"], intensity: ["高压"], weight: 8 },
+          { text: "故事从外部冲突转向主角的自我审判", focus: ["道德选择"], intensity: ["疯狂"], weight: 7 }
+        ],
+        cost: [
+          { text: "必须背叛一位盟友", focus: ["人物关系", "权力斗争"], intensity: ["高压", "疯狂"], weight: 9 },
+          { text: "会失去回家的机会", focus: ["生存危机", "人物关系"], intensity: ["紧张", "高压"], weight: 7 },
+          { text: "真相将毁掉受害者最后的尊严", focus: ["道德选择", "秘密揭露"], intensity: ["克制", "紧张"], weight: 9 },
+          { text: "必须承认自己曾经参与其中", focus: ["道德选择", "秘密揭露"], intensity: ["高压", "疯狂"], weight: 8 },
+          { text: "会让城镇陷入更大的恐慌", focus: ["生存危机", "权力斗争"], intensity: ["高压"], weight: 7 },
+          { text: "要牺牲一个珍贵的谎言", focus: ["人物关系", "道德选择"], intensity: ["克制", "紧张"], weight: 8 }
+        ],
+        reveal: [
+          { text: "旧事件其实从未结束", focus: ["秘密揭露"], genres: ["悬疑", "恐怖", "历史"], types: ["秘密"], weight: 9 },
+          { text: "受害者主动制造了案发现场", focus: ["秘密揭露", "道德选择"], genres: ["悬疑"], types: ["物件"], weight: 8 },
+          { text: "主角一直被当作实验样本观察", focus: ["秘密揭露", "生存危机"], genres: ["科幻", "恐怖"], types: ["人物"], weight: 8 },
+          { text: "传说是某个组织的加密记录", focus: ["权力斗争", "秘密揭露"], genres: ["奇幻", "历史", "武侠"], types: ["物件"], weight: 7 },
+          { text: "真正的敌人藏在求救者之中", focus: ["人物关系", "生存危机"], genres: ["悬疑", "都市", "恐怖"], types: ["人物"], weight: 8 },
+          { text: "遗物不是证据，而是一把钥匙", focus: ["秘密揭露"], genres: ["奇幻", "悬疑", "历史"], types: ["物件"], weight: 7 }
+        ],
+        twist: [
+          { text: "救人方法和杀人方法完全相同", focus: ["道德选择", "生存危机"], intensity: ["高压", "疯狂"], weight: 9 },
+          { text: "反派说的每句话都是真的，但顺序被调换了", focus: ["秘密揭露"], intensity: ["克制", "紧张"], weight: 9 },
+          { text: "主角赢下冲突后才发现自己完成了对方计划", focus: ["权力斗争", "秘密揭露"], intensity: ["高压", "疯狂"], weight: 8 },
+          { text: "被保护的人才是危机源头", focus: ["人物关系", "生存危机"], intensity: ["紧张", "高压"], weight: 8 },
+          { text: "所谓背叛是为了阻止更早的背叛", focus: ["人物关系", "道德选择"], intensity: ["克制", "紧张"], weight: 7 },
+          { text: "结局需要主角亲手销毁唯一证据", focus: ["秘密揭露", "道德选择"], intensity: ["高压"], weight: 8 }
+        ],
+        ending: [
+          { text: "主角保住了想守护的人，但必须永远背负未公开的真相", focus: ["人物关系", "秘密揭露"], intensity: ["克制", "紧张"], weight: 8 },
+          { text: "真相公开，所有人都得救，唯独主角再也无法回到原来的生活", focus: ["道德选择", "秘密揭露"], intensity: ["紧张", "高压"], weight: 8 },
+          { text: "反派失败，却留下一个会在续篇爆发的新规则", focus: ["权力斗争", "生存危机"], intensity: ["高压", "疯狂"], weight: 7 },
+          { text: "主角赢得表面胜利，随后发现自己成为下一轮冲突的源头", focus: ["权力斗争", "秘密揭露"], intensity: ["疯狂"], weight: 8 },
+          { text: "最坏的结局被避免，但一段重要关系彻底断裂", focus: ["人物关系", "道德选择"], intensity: ["高压"], weight: 7 },
+          { text: "故事以和解收束，但读者知道关键证据仍在暗处", focus: ["秘密揭露"], intensity: ["克制"], weight: 6 }
+        ],
+        branchChoices: [
+          { choice: "坦白一部分", result: "关系暂时稳定，但隐瞒的那部分会在下一节点变成反噬", focus: ["人物关系", "秘密揭露"], weight: 8 },
+          { choice: "继续隐瞒", result: "行动空间变大，信任却开始失血", focus: ["人物关系", "权力斗争"], weight: 7 },
+          { choice: "保护当事人", result: "情感线保住了，证据链出现缺口", focus: ["人物关系", "道德选择"], weight: 8 },
+          { choice: "保护证据", result: "逻辑链更完整，但无辜者承担了压力", focus: ["秘密揭露", "道德选择"], weight: 8 },
+          { choice: "立刻行动", result: "抢到先机，也迫使对手提前暴露底牌", focus: ["生存危机", "权力斗争"], weight: 7 },
+          { choice: "等待更多线索", result: "判断更准确，但失去阻止下一次伤害的窗口", focus: ["秘密揭露", "生存危机"], weight: 7 },
+          { choice: "相信直觉", result: "主角绕过规则，却把自己推到无证据的位置", focus: ["道德选择", "秘密揭露"], weight: 6 },
+          { choice: "相信规则", result: "程序上站稳脚跟，情感上却被对手利用", focus: ["权力斗争", "人物关系"], weight: 6 }
+        ]
+      };
+
+      var dom = {};
+      var app = {
+        input: null,
+        ideas: [],
+        result: null,
+        timeline: null,
+        timelineLayout: "vertical",
+        timelineTicking: false,
+        inspirationPool: []
+      };
+
+      function $(id) {
+        return document.getElementById(id);
+      }
+
+      function cacheDom() {
+        ["story-form", "imagine-start", "inspiration-bubbles", "keywords", "genre", "intensity", "hero", "focus", "seedIdea", "generate", "randomize", "clear", "copy", "download", "branch", "savedAt", "ideaCount", "brainCount", "twistCount", "conflictScore", "output", "ideas", "logic", "timeline", "toast", "history-panel", "trends-panel", "history-toggle", "trends-toggle", "history-search", "history-list", "clear-history", "trends-content"].forEach(function (id) {
+          dom[id] = $(id);
+        });
+        dom.form = dom["story-form"];
+        dom.imagineStart = dom["imagine-start"];
+        dom.inspirationBubbles = dom["inspiration-bubbles"];
+        dom.historyPanel = dom["history-panel"];
+        dom.trendsPanel = dom["trends-panel"];
+        dom.historyToggle = dom["history-toggle"];
+        dom.trendsToggle = dom["trends-toggle"];
+        dom.historySearch = dom["history-search"];
+        dom.historyList = dom["history-list"];
+        dom.clearHistory = dom["clear-history"];
+        dom.trendsContent = dom["trends-content"];
+      }
+
+      function pick(list) {
+        return list[Math.floor(Math.random() * list.length)];
+      }
+
+      function includesAny(list, values) {
+        if (!list || !values || !values.length) return false;
+        return values.some(function (value) {
+          return list.indexOf(value) !== -1;
+        });
+      }
+
+      function keywordProfile(input) {
+        var keywords = input.keywords.length ? input.keywords : ["秘密", "证据", "旧事"];
+        var typeScores = {};
+        engineBank.keywordTypes.forEach(function (rule) {
+          typeScores[rule.type] = 0;
+        });
+        keywords.forEach(function (word) {
+          engineBank.keywordTypes.forEach(function (rule) {
+            rule.tests.forEach(function (test) {
+              if (word.indexOf(test) !== -1) typeScores[rule.type] += 1;
+            });
+          });
+        });
+        var types = Object.keys(typeScores).filter(function (type) {
+          return typeScores[type] > 0;
+        });
+        if (!types.length) types = ["秘密"];
+        types.sort(function (a, b) {
+          return typeScores[b] - typeScores[a];
+        });
+        return {
+          primary: keywords[0],
+          secondary: keywords[1] || keywords[0],
+          motif: keywords[2] || keywords[0],
+          types: types,
+          dominantType: types[0],
+          label: types.join(" / ")
+        };
+      }
+
+      function materialScore(item, input, profile, stage) {
+        var score = item.weight || 1;
+        if (item.genres && item.genres.indexOf(input.genre) !== -1) score += 4;
+        if (item.focus && item.focus.indexOf(input.focus) !== -1) score += 5;
+        if (item.intensity && item.intensity.indexOf(input.intensity) !== -1) score += 3;
+        if (item.types && includesAny(item.types, profile.types)) score += 3;
+        if (stage === "twist" && input.intensity === "疯狂") score += 2;
+        if (stage === "cost" && input.focus === "道德选择") score += 2;
+        return Math.max(1, score);
+      }
+
+      function weightedSelect(list, input, profile, stage, avoidText) {
+        var scored = list.map(function (item) {
+          var score = materialScore(item, input, profile, stage);
+          if (avoidText && item.text === avoidText) score = Math.max(1, Math.floor(score / 3));
+          return { item: item, score: score };
+        });
+        var total = scored.reduce(function (sum, entry) {
+          return sum + entry.score;
+        }, 0);
+        var cursor = Math.random() * total;
+        for (var i = 0; i < scored.length; i += 1) {
+          cursor -= scored[i].score;
+          if (cursor <= 0) return scored[i].item;
+        }
+        return scored[scored.length - 1].item;
+      }
+
+      function makeGrammarNode(stage, label, connector, text, cause) {
+        return {
+          stage: stage,
+          label: label,
+          connector: connector,
+          text: text,
+          cause: cause
+        };
+      }
+
+      function buildStoryTree(input) {
+        var profile = keywordProfile(input);
+        var selected = {};
+        var previousText = "";
+        ["desire", "obstacle", "action", "consequence", "cost", "reveal", "twist", "ending"].forEach(function (stage) {
+          selected[stage] = weightedSelect(engineBank[stage], input, profile, stage, previousText);
+          previousText = selected[stage].text;
+        });
+        var source = "“" + profile.primary + "”不是孤立元素，它更像一个" + profile.dominantType + "型触发器，把“" + profile.secondary + "”和“" + profile.motif + "”绑进同一场冲突。";
+        var nodes = [
+          makeGrammarNode("source", "源头", "因为", source, "关键词类型：" + profile.label),
+          makeGrammarNode("desire", "欲望", "所以", input.hero + "想要" + selected.desire.text + "。", "源头事件给主角一个必须行动的理由。"),
+          makeGrammarNode("obstacle", "阻碍", "但是", selected.obstacle.text + "。", "阻碍必须直接卡住欲望，不能只是制造气氛。"),
+          makeGrammarNode("action", "行动", "于是", input.hero + "选择" + selected.action.text + "。", "行动必须回应阻碍，并制造新的问题。"),
+          makeGrammarNode("consequence", "后果", "导致", selected.consequence.text + "。", "后果来自主角选择，而不是凭空发生。"),
+          makeGrammarNode("cost", "代价", "代价是", selected.cost.text + "。", "代价让选择变得不可逆。"),
+          makeGrammarNode("reveal", "揭示", "随后发现", selected.reveal.text + "。", "揭示重解释前面的线索。"),
+          makeGrammarNode("twist", "反转", "真正反转是", selected.twist.text + "。", "反转改变胜负意义，而不是只换一个凶手。"),
+          makeGrammarNode("ending", "结局状态", "最后", selected.ending.text + "。", "结局保留一个可继续扩写的余波。")
+        ];
+        var focusBonus = nodes.filter(function (node) {
+          return node.text.indexOf(input.focus.replace("选择", "")) !== -1;
+        }).length;
+        var intensityBase = { "克制": 46, "紧张": 64, "高压": 80, "疯狂": 94 }[input.intensity] || 64;
+        return {
+          profile: profile,
+          selected: selected,
+          nodes: nodes,
+          grammar: engineBank.grammar,
+          score: Math.min(99, intensityBase + focusBonus + profile.types.length)
+        };
+      }
+
+      function nodeText(tree, stage) {
+        var node = tree.nodes.find(function (item) {
+          return item.stage === stage;
+        });
+        return node ? node.text : "";
+      }
+
+      function escapeHTML(value) {
+        return String(value || "").replace(/[&<>'"]/g, function (char) {
+          return { "&": "&amp;", "<": "&lt;", ">": "&gt;", "'": "&#39;", '"': "&quot;" }[char];
+        });
+      }
+
+      function splitKeywords(value) {
+        var parts = String(value || "").split(/[，,、\n\s]+/);
+        return parts.map(function (item) { return item.trim(); }).filter(Boolean).slice(0, 12);
+      }
+
+      function uniqueTokens(tokens) {
+        var seen = {};
+        return tokens.map(function (token) {
+          return String(token || "").trim();
+        }).filter(function (token) {
+          if (!token || seen[token]) return false;
+          seen[token] = true;
+          return true;
+        });
+      }
+
+      function loadInspirationPool() {
+        var saved = readJSON(storageKeys.inspiration, []);
+        app.inspirationPool = uniqueTokens(saved.concat(defaultInspirationPool)).slice(0, 18);
+      }
+
+      function saveInspirationPool() {
+        writeJSON(storageKeys.inspiration, app.inspirationPool.slice(0, 18));
+      }
+
+      function renderInspirationBubbles() {
+        if (!dom.inspirationBubbles) return;
+        var visibleTokens = uniqueTokens(app.inspirationPool.concat(defaultInspirationPool)).slice(0, 8);
+        dom.inspirationBubbles.innerHTML = visibleTokens.map(function (token) {
+          return "<button class=\"inspiration-bubble\" type=\"button\" data-inspiration=\"" + escapeHTML(token) + "\">" + escapeHTML(token) + "</button>";
+        }).join("");
+      }
+
+      function addToInspirationPool(tokens) {
+        var incoming = uniqueTokens(tokens);
+        if (!incoming.length) return;
+        app.inspirationPool = uniqueTokens(incoming.concat(app.inspirationPool).concat(defaultInspirationPool)).slice(0, 18);
+        saveInspirationPool();
+        renderInspirationBubbles();
+      }
+
+      function readJSON(key, fallback) {
+        try {
+          var raw = localStorage.getItem(key);
+          return raw ? JSON.parse(raw) : fallback;
+        } catch (error) {
+          return fallback;
+        }
+      }
+
+      function writeJSON(key, value) {
+        try {
+          localStorage.setItem(key, JSON.stringify(value));
+        } catch (error) {
+          console.warn("保存失败", error);
+        }
+      }
+
+      function notify(message) {
+        dom.toast.textContent = message;
+        dom.toast.classList.add("show");
+        window.clearTimeout(notify.timer);
+        notify.timer = window.setTimeout(function () {
+          dom.toast.classList.remove("show");
+        }, 1800);
+      }
+
+      function focusKeywordField() {
+        dom.keywords.classList.remove("keywords-pulse");
+        void dom.keywords.offsetWidth;
+        dom.keywords.classList.add("keywords-pulse");
+        dom.keywords.focus({ preventScroll: true });
+      }
+
+      function jumpToGenerator() {
+        var target = document.getElementById("generator");
+        if (target && target.scrollIntoView) {
+          target.scrollIntoView({ behavior: "smooth", block: "start" });
+        }
+        window.setTimeout(focusKeywordField, 420);
+      }
+
+      function addKeywordToken(token) {
+        var current = splitKeywords(dom.keywords.value);
+        if (current.indexOf(token) === -1) current.push(token);
+        dom.keywords.value = current.join("、");
+        addToInspirationPool([token]);
+        saveDraft();
+        jumpToGenerator();
+        notify("已加入灵感词：" + token);
+      }
+
+      function getInput() {
+        var keywords = splitKeywords(dom.keywords.value);
+        return {
+          rawKeywords: keywords,
+          keywords: keywords.length ? keywords : ["秘密", "证据", "旧事"],
+          genre: dom.genre.value || "悬疑",
+          intensity: dom.intensity.value || "紧张",
+          hero: dom.hero.value.trim().slice(0, 48) || "一个被卷入事件的普通人",
+          focus: dom.focus.value || "秘密揭露",
+          seedIdea: dom.seedIdea.value.trim().slice(0, 700)
+        };
+      }
+
+      function saveDraft() {
+        writeJSON(storageKeys.state, {
+          fields: {
+            keywords: dom.keywords.value,
+            genre: dom.genre.value,
+            intensity: dom.intensity.value,
+            hero: dom.hero.value,
+            focus: dom.focus.value,
+            seedIdea: dom.seedIdea.value
+          },
+          timelineLayout: app.timelineLayout
+        });
+      }
+
+      function restoreDraft() {
+        var saved = readJSON(storageKeys.state, null);
+        if (!saved) return;
+        var fields = saved.fields || {};
+        Object.keys(fields).forEach(function (id) {
+          if (dom[id]) dom[id].value = fields[id];
+        });
+        setTimelineLayout(saved.timelineLayout || "vertical", false);
+      }
+
+      function getHistory() {
+        return readJSON(storageKeys.history, []);
+      }
+
+      function addHistory(entry) {
+        var history = getHistory();
+        var next = Object.assign({
+          id: Date.now().toString(36) + Math.random().toString(36).slice(2, 8),
+          createdAt: new Date().toISOString()
+        }, entry);
+        history.unshift(next);
+        writeJSON(storageKeys.history, history.slice(0, 60));
+        renderHistory();
+        renderTrends();
+        return next;
+      }
+
+      function buildIdeas(input, tree) {
+        var tone = bank.genre[input.genre] || bank.genre["悬疑"];
+        return [
+          { tag: "规则引擎", text: "关键词被识别为“" + tree.profile.label + "”，因此本次优先抽取和“" + input.genre + " / " + input.focus + " / " + input.intensity + "”匹配的素材。" },
+          { tag: "人物欲望", text: nodeText(tree, "desire") + "它必须由源头事件触发，而不是凭空出现。" },
+          { tag: "异常线索", text: "围绕“" + tree.profile.primary + "”放置一个反常细节：“" + pick(tone) + "”。它先制造误读，再服务后面的揭示。" },
+          { tag: "关系压力", text: "最能帮助主角的人，也应该拥有阻止主角继续查下去的理由；这样“" + input.focus + "”才会变成情节压力。" },
+          { tag: "不可逆代价", text: nodeText(tree, "cost") + "这个代价会把行动选择锁死，让后果不能轻易撤销。" },
+          { tag: "反转约束", text: nodeText(tree, "twist") + "它需要重新解释前面的阻碍和后果，而不是只做表面惊喜。" }
+        ];
+      }
+
+      function buildResult(input, ideas, tree) {
+        var symbol = tree.profile.primary;
+        var seedLine = input.seedIdea ? "已有想法被纳入为误导或伏笔：" + input.seedIdea : "可以把“" + input.keywords.join("、") + "”分别作为人物、地点、物件或禁忌规则来使用。";
+        return {
+          title: symbol + "引发的" + input.genre + "冲突",
+          symbol: symbol,
+          desire: tree.selected.desire.text,
+          obstacle: tree.selected.obstacle.text,
+          cost: tree.selected.cost.text,
+          secret: tree.selected.reveal.text,
+          twist: tree.selected.twist.text,
+          score: tree.score,
+          tree: tree,
+          nodes: tree.nodes,
+          paragraphs: [
+            tree.nodes.slice(0, 5).map(function (node) { return node.connector + "，" + node.text; }).join(" "),
+            tree.nodes.slice(5).map(function (node) { return node.connector + "，" + node.text; }).join(" ")
+          ],
+          beats: [
+            "匹配规则：题材=" + input.genre + "，焦点=" + input.focus + "，强度=" + input.intensity + "，关键词类型=" + tree.profile.label + "。",
+            "中段升级：" + tree.selected.reveal.text + "。",
+            "人物撕裂：主角必须在“" + input.focus + "”和原始目标之间做选择。",
+            "结尾反转：" + tree.selected.twist.text + "。",
+            "扩写方向：" + seedLine
+          ],
+          ideaCount: ideas.length,
+          logicCount: tree.nodes.length,
+          twistCount: 1
+        };
+      }
+
+      function renderResult(result) {
+        var html = "<h3>" + escapeHTML(result.title) + "</h3>";
+        html += result.paragraphs.map(function (item) {
+          return "<p>" + escapeHTML(item) + "</p>";
+        }).join("");
+        html += "<ul>" + result.beats.map(function (item) {
+          return "<li>" + escapeHTML(item) + "</li>";
+        }).join("") + "</ul>";
+        dom.output.innerHTML = html;
+      }
+
+      function renderIdeas(ideas) {
+        dom.ideas.innerHTML = ideas.map(function (idea, index) {
+          return "<article class=\"card\" data-idea-index=\"" + index + "\"><span class=\"tag\">" + escapeHTML(idea.tag) + "</span><p>" + escapeHTML(idea.text) + "</p><button type=\"button\">加入想法</button></article>";
+        }).join("");
+      }
+
+      function renderLogic(input, result) {
+        dom.logic.innerHTML = result.nodes.map(function (node, index) {
+          var prefix = index === 0 ? node.label : node.connector + " · " + node.label;
+          return "<div><b>" + escapeHTML(prefix) + "</b><span>" + escapeHTML(node.text) + "</span><small>" + escapeHTML(node.cause) + "</small></div>";
+        }).join("");
+      }
+
+      function updateStats(result) {
+        dom.ideaCount.textContent = result ? result.ideaCount : 0;
+        dom.brainCount.textContent = result ? result.logicCount : 0;
+        dom.twistCount.textContent = result ? result.twistCount : 0;
+        dom.conflictScore.textContent = result ? result.score : 0;
+      }
+
+      function createTimeline(input, result, tree) {
+        var id = 1;
+        function node(title, event, depth) {
+          var item = { id: id, title: "节点 " + id + "：" + title, event: event, depth: depth, branches: [] };
+          id += 1;
+          return item;
+        }
+        function branchChoice(avoidText) {
+          var choice = weightedSelect(engineBank.branchChoices, input, tree.profile, "branch", avoidText);
+          return choice;
+        }
+        function createOutcome(choice, depth, isEnding) {
+          var consequence = weightedSelect(engineBank.consequence, input, tree.profile, "consequence", result.obstacle);
+          var cost = weightedSelect(engineBank.cost, input, tree.profile, "cost", result.cost);
+          var reveal = weightedSelect(engineBank.reveal, input, tree.profile, "reveal", result.secret);
+          var ending = weightedSelect(engineBank.ending, input, tree.profile, "ending", "");
+          if (isEnding) {
+            return {
+              label: "结局线",
+              event: "因为选择“" + choice.choice + "”，" + choice.result + "；" + cost.text + "，最终形成后果：" + ending.text + "。"
+            };
+          }
+          return {
+            label: "二级分叉",
+            event: "选择“" + choice.choice + "”后，" + consequence.text + "；随后发现：" + reveal.text + "。"
+          };
+        }
+        function expand(current, depth, maxDepth, avoidText) {
+          if (depth >= maxDepth) return;
+          var first = branchChoice(avoidText);
+          var second = branchChoice(first.choice);
+          current.branches = [first, second].map(function (choice) {
+            var end = depth + 1 >= maxDepth;
+            var outcome = createOutcome(choice, depth, end);
+            var next = node(outcome.label, outcome.event, depth + 1);
+            var branch = {
+              choice: choice.choice,
+              result: choice.result,
+              next: next
+            };
+            expand(next, depth + 1, maxDepth, choice.choice);
+            return branch;
+          });
+        }
+        var root = node("源头事件", nodeText(tree, "source") + " 第一处分叉来自主角如何回应阻碍：“" + result.obstacle + "”。", 0);
+        expand(root, 0, 2, "");
+        return root;
+      }
+
+      function timelineNodeHTML(item) {
+        var endingClass = item.branches.length === 0 && item.depth > 0 ? " timeline-ending" : "";
+        var html = "<div class=\"timeline-node\" data-node-id=\"" + item.id + "\" data-depth=\"" + item.depth + "\">";
+        html += "<div class=\"timeline-card" + endingClass + "\" data-card=\"node\"><b>" + escapeHTML(item.title) + "</b><span>" + escapeHTML(item.event) + "</span></div>";
+        if (item.branches.length) {
+          html += "<div class=\"timeline-branches\">";
+          html += item.branches.map(function (branch) {
+            return "<div class=\"timeline-path\"><div class=\"choice-card\" data-card=\"choice\"><b>选择：" + escapeHTML(branch.choice) + "</b><span>结果：" + escapeHTML(branch.result) + "</span></div>" + timelineNodeHTML(branch.next) + "</div>";
+          }).join("");
+          html += "</div>";
+        }
+        html += "</div>";
+        return html;
+      }
+
+      function timelineText(item, indent) {
+        var space = indent || "";
+        var lines = [space + item.title + "：" + item.event];
+        item.branches.forEach(function (branch) {
+          lines.push(space + "  选择：" + branch.choice);
+          lines.push(space + "  结果：" + branch.result);
+          lines.push(timelineText(branch.next, space + "    "));
+        });
+        return lines.join("\n");
+      }
+
+      function timelineSvg() {
+        return "<svg class=\"timeline-flow\" id=\"timelineFlow\" aria-hidden=\"true\"><defs><filter id=\"timelineGlow\" x=\"-70%\" y=\"-70%\" width=\"240%\" height=\"240%\"><feGaussianBlur stdDeviation=\"3.2\" result=\"blur\"></feGaussianBlur><feMerge><feMergeNode in=\"blur\"></feMergeNode><feMergeNode in=\"SourceGraphic\"></feMergeNode></feMerge></filter></defs></svg>";
+      }
+
+      function renderTimeline(timeline) {
+        if (!timeline) {
+          dom.timeline.innerHTML = timelineSvg() + "<div class=\"timeline-card\"><b>节点 1：源头事件</b><span>生成冲突后，这里会展开多条可能的结局线。</span></div>";
+          dom.timeline.dataset.text = "节点 1：源头事件：生成冲突后，这里会展开多条可能的结局线。";
+        } else {
+          dom.timeline.innerHTML = timelineSvg() + "<div class=\"timeline-tree\">" + timelineNodeHTML(timeline) + "</div>";
+          dom.timeline.dataset.text = timelineText(timeline);
+        }
+        setTimelineLayout(app.timelineLayout, false);
+        scheduleTimelineFlow();
+      }
+
+      function setTimelineLayout(layout, shouldSave) {
+        app.timelineLayout = layout === "horizontal" ? "horizontal" : "vertical";
+        dom.timeline.classList.toggle("timeline-horizontal", app.timelineLayout === "horizontal");
+        dom.timeline.classList.toggle("timeline-vertical", app.timelineLayout === "vertical");
+        dom.timeline.scrollTop = 0;
+        dom.timeline.scrollLeft = 0;
+        document.querySelectorAll("[data-timeline-layout]").forEach(function (button) {
+          var active = button.dataset.timelineLayout === app.timelineLayout;
+          button.classList.toggle("is-active", active);
+          button.setAttribute("aria-pressed", active ? "true" : "false");
+        });
+        if (shouldSave !== false) saveDraft();
+        scheduleTimelineFlow();
+      }
+
+      function directChild(parent, selector) {
+        return Array.prototype.slice.call(parent.children).find(function (child) {
+          return child.matches(selector);
+        });
+      }
+
+      function cardPoint(card, timelineRect, side) {
+        var rect = card.getBoundingClientRect();
+        var x = rect.left - timelineRect.left + dom.timeline.scrollLeft;
+        var y = rect.top - timelineRect.top + dom.timeline.scrollTop;
+        var points = {
+          top: [x + rect.width / 2, y],
+          right: [x + rect.width, y + rect.height / 2],
+          bottom: [x + rect.width / 2, y + rect.height],
+          left: [x, y + rect.height / 2]
+        };
+        return points[side] || [x + rect.width / 2, y + rect.height / 2];
+      }
+
+      function curvePath(from, to, mode) {
+        if (mode === "horizontal") {
+          var dx = Math.max(72, Math.abs(to[0] - from[0]) * 0.48);
+          return "M " + from[0] + " " + from[1] + " C " + (from[0] + dx) + " " + from[1] + ", " + (to[0] - dx) + " " + to[1] + ", " + to[0] + " " + to[1];
+        }
+        var dy = Math.max(44, Math.abs(to[1] - from[1]) * 0.42);
+        return "M " + from[0] + " " + from[1] + " C " + from[0] + " " + (from[1] + dy) + ", " + to[0] + " " + (to[1] - dy) + ", " + to[0] + " " + to[1];
+      }
+
+      function appendPath(svg, from, to, className, mode) {
+        var path = document.createElementNS("http://www.w3.org/2000/svg", "path");
+        path.setAttribute("class", ("timeline-line " + (className || "")).trim());
+        path.setAttribute("d", curvePath(from, to, mode));
+        svg.appendChild(path);
+      }
+
+      function appendDot(svg, point) {
+        var dot = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+        dot.setAttribute("class", "timeline-dot");
+        dot.setAttribute("cx", point[0]);
+        dot.setAttribute("cy", point[1]);
+        dot.setAttribute("r", "3.2");
+        svg.appendChild(dot);
+      }
+
+      function drawTimelineFlow() {
+        app.timelineTicking = false;
+        var svg = $("timelineFlow");
+        var tree = dom.timeline.querySelector(".timeline-tree");
+        if (!svg || !tree) return;
+        var rect = dom.timeline.getBoundingClientRect();
+        var width = Math.max(dom.timeline.clientWidth, dom.timeline.scrollWidth);
+        var height = Math.max(dom.timeline.clientHeight, dom.timeline.scrollHeight);
+        svg.setAttribute("width", width);
+        svg.setAttribute("height", height);
+        svg.style.width = width + "px";
+        svg.style.height = height + "px";
+        svg.querySelectorAll(".timeline-line, .timeline-dot").forEach(function (item) { item.remove(); });
+        tree.querySelectorAll(".timeline-node").forEach(function (node) {
+          var parentCard = directChild(node, "[data-card='node']");
+          var branches = directChild(node, ".timeline-branches");
+          if (!parentCard || !branches) return;
+          var horizontalRoot = app.timelineLayout === "horizontal" && node.dataset.depth === "0";
+          Array.prototype.slice.call(branches.children).forEach(function (pathNode) {
+            var choiceCard = directChild(pathNode, "[data-card='choice']");
+            var nextNode = directChild(pathNode, ".timeline-node");
+            var nextCard = nextNode ? directChild(nextNode, "[data-card='node']") : null;
+            if (!choiceCard || !nextCard) return;
+            var parentOut = cardPoint(parentCard, rect, horizontalRoot ? "right" : "bottom");
+            var choiceIn = cardPoint(choiceCard, rect, horizontalRoot ? "left" : "top");
+            var choiceOut = cardPoint(choiceCard, rect, "bottom");
+            var nextIn = cardPoint(nextCard, rect, "top");
+            appendPath(svg, parentOut, choiceIn, "", horizontalRoot ? "horizontal" : "vertical");
+            appendPath(svg, choiceOut, nextIn, "choice-link", "vertical");
+            appendDot(svg, parentOut);
+          });
+        });
+      }
+
+      function scheduleTimelineFlow() {
+        if (app.timelineTicking) return;
+        app.timelineTicking = true;
+        window.requestAnimationFrame(drawTimelineFlow);
+      }
+
+      function generate(options) {
+        var settings = options || {};
+        var input = getInput();
+        var tree = buildStoryTree(input);
+        var ideas = buildIdeas(input, tree);
+        var result = buildResult(input, ideas, tree);
+        var timeline = createTimeline(input, result, tree);
+        app.input = input;
+        app.ideas = ideas;
+        app.result = result;
+        app.timeline = timeline;
+        renderResult(result);
+        renderIdeas(ideas);
+        renderLogic(input, result);
+        renderTimeline(timeline);
+        updateStats(result);
+        dom.savedAt.textContent = "已生成于 " + new Date().toLocaleTimeString("zh-CN", { hour: "2-digit", minute: "2-digit" });
+        addToInspirationPool(input.rawKeywords);
+        saveDraft();
+        if (settings.saveHistory !== false) {
+          addHistory({ input: input, result: result, storyTree: tree, timelineText: timelineText(timeline) });
+        }
+        notify(settings.message || "冲突已生成");
+      }
+
+      function resetAll() {
+        [dom.keywords, dom.hero, dom.seedIdea].forEach(function (field) { field.value = ""; });
+        dom.genre.value = "悬疑";
+        dom.intensity.value = "紧张";
+        dom.focus.value = "秘密揭露";
+        app.input = null;
+        app.ideas = [];
+        app.result = null;
+        app.timeline = null;
+        dom.output.innerHTML = "<h3>等一个关键词</h3><p>先输入几个词，比如人物、地点、物件、秘密或情绪。这个工具会把散点推成冲突。</p>";
+        dom.ideas.innerHTML = "";
+        dom.logic.innerHTML = "";
+        renderTimeline(null);
+        updateStats(null);
+        dom.savedAt.textContent = "尚未生成";
+        saveDraft();
+        notify("已清空");
+      }
+
+      function randomize() {
+        var sample = pick(bank.samples);
+        dom.keywords.value = sample.join("、");
+        dom.hero.value = pick(bank.heroes);
+        dom.genre.value = pick(Object.keys(bank.genre));
+        dom.intensity.value = pick(["克制", "紧张", "高压", "疯狂"]);
+        dom.focus.value = pick(["人物关系", "秘密揭露", "道德选择", "生存危机", "权力斗争"]);
+        generate({ message: "随机灵感已生成" });
+      }
+
+      function currentText() {
+        if (!app.result || !app.input) return dom.output.innerText.trim();
+        return [
+          app.result.title,
+          "",
+          dom.output.innerText.trim(),
+          "",
+          "想法池",
+          app.ideas.map(function (idea) { return "- [" + idea.tag + "] " + idea.text; }).join("\n"),
+          "",
+          "逻辑链",
+          dom.logic.innerText.trim(),
+          "",
+          "分支时间线",
+          dom.timeline.dataset.text || ""
+        ].join("\n");
+      }
+
+      function copyText() {
+        var text = currentText();
+        if (!text) return notify("暂无可复制内容");
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(text).then(function () { notify("已复制当前结果"); }).catch(function () { fallbackCopy(text); });
+        } else {
+          fallbackCopy(text);
+        }
+      }
+
+      function fallbackCopy(text) {
+        var area = document.createElement("textarea");
+        area.value = text;
+        document.body.appendChild(area);
+        area.select();
+        document.execCommand("copy");
+        area.remove();
+        notify("已复制当前结果");
+      }
+
+      function downloadText() {
+        var text = currentText();
+        if (!text) return notify("暂无可导出内容");
+        var blob = new Blob([text], { type: "text/plain;charset=utf-8" });
+        var link = document.createElement("a");
+        link.href = URL.createObjectURL(blob);
+        link.download = "novel-conflict-" + new Date().toISOString().slice(0, 10) + ".txt";
+        link.click();
+        URL.revokeObjectURL(link.href);
+        notify("文本已导出");
+      }
+
+      function togglePanel(id, open) {
+        var panel = $(id);
+        if (!panel) return;
+        var willOpen = typeof open === "boolean" ? open : !panel.classList.contains("open");
+        panel.classList.toggle("open", willOpen);
+        panel.setAttribute("aria-hidden", willOpen ? "false" : "true");
+        if (id === "history-panel" && willOpen) renderHistory();
+        if (id === "trends-panel" && willOpen) renderTrends();
+      }
+
+      function renderHistory() {
+        var query = (dom.historySearch.value || "").trim().toLowerCase();
+        var history = getHistory().filter(function (item) {
+          if (!query) return true;
+          return JSON.stringify(item).toLowerCase().indexOf(query) !== -1;
+        });
+        if (!history.length) {
+          dom.historyList.innerHTML = "<p class=\"small\">暂无历史记录。</p>";
+          return;
+        }
+        dom.historyList.innerHTML = history.map(function (item) {
+          var input = item.input || {};
+          var result = item.result || {};
+          var date = item.createdAt ? new Date(item.createdAt).toLocaleString("zh-CN") : "未知时间";
+          return "<article class=\"history-item\" data-history-id=\"" + escapeHTML(item.id) + "\"><b>" + escapeHTML(result.title || "未命名冲突") + "</b><span>" + escapeHTML(date) + " · " + escapeHTML(input.genre || "") + " · " + escapeHTML(input.intensity || "") + "</span><p>" + escapeHTML((input.keywords || []).join("、")) + "</p><button type=\"button\">载入</button></article>";
+        }).join("");
+      }
+
+      function loadHistory(id) {
+        var item = getHistory().find(function (entry) { return entry.id === id; });
+        if (!item || !item.input) return;
+        dom.keywords.value = (item.input.keywords || []).join("、");
+        dom.genre.value = item.input.genre || "悬疑";
+        dom.intensity.value = item.input.intensity || "紧张";
+        dom.hero.value = item.input.hero || "";
+        dom.focus.value = item.input.focus || "秘密揭露";
+        dom.seedIdea.value = item.input.seedIdea || "";
+        generate({ saveHistory: false, message: "历史记录已载入" });
+        togglePanel("history-panel", false);
+      }
+
+      function renderTrends() {
+        var history = getHistory();
+        if (history.length < 3) {
+          dom.trendsContent.innerHTML = "<p>再生成 " + (3 - history.length) + " 条记录后，这里会显示你的常用类型、关键词和冲突强度倾向。</p>";
+          return;
+        }
+        var genres = {};
+        var intensities = {};
+        var keywords = {};
+        var scoreTotal = 0;
+        history.forEach(function (item) {
+          var input = item.input || {};
+          var result = item.result || {};
+          genres[input.genre] = (genres[input.genre] || 0) + 1;
+          intensities[input.intensity] = (intensities[input.intensity] || 0) + 1;
+          (input.keywords || []).forEach(function (word) { keywords[word] = (keywords[word] || 0) + 1; });
+          scoreTotal += Number(result.score || 0);
+        });
+        function top(map) {
+          return Object.keys(map).sort(function (a, b) { return map[b] - map[a]; })[0] || "暂无";
+        }
+        var common = Object.keys(keywords).sort(function (a, b) { return keywords[b] - keywords[a]; }).slice(0, 6);
+        var average = Math.round(scoreTotal / history.length);
+        dom.trendsContent.innerHTML = "<div class=\"trend-grid\"><div><b>常用类型</b><span>" + escapeHTML(top(genres)) + "</span></div><div><b>常用强度</b><span>" + escapeHTML(top(intensities)) + "</span></div><div><b>平均张力</b><span>" + average + "</span></div></div><p><b>高频关键词：</b>" + escapeHTML(common.join("、") || "暂无") + "</p><p>预测：你最近更适合继续写“" + escapeHTML(top(genres)) + " + " + escapeHTML(top(intensities)) + "”结构。下一次可以故意降低一个情绪层级，让人物选择承担更多张力。</p>";
+      }
+
+      function bindEvents() {
+        dom["story-form"].addEventListener("submit", function (event) {
+          event.preventDefault();
+          generate();
+        });
+        dom.imagineStart.addEventListener("click", function () {
+          jumpToGenerator();
+          notify("开始想象，从关键词出发");
+        });
+        dom.inspirationBubbles.addEventListener("click", function (event) {
+          var button = event.target.closest("[data-inspiration]");
+          if (!button) return;
+          addKeywordToken(button.dataset.inspiration);
+        });
+        dom.randomize.addEventListener("click", randomize);
+        dom.clear.addEventListener("click", resetAll);
+        dom.copy.addEventListener("click", copyText);
+        dom.download.addEventListener("click", downloadText);
+        dom.branch.addEventListener("click", function () {
+          if (!app.input || !app.result) return generate({ message: "已生成新的分支时间线" });
+          app.timeline = createTimeline(app.input, app.result, app.result.tree);
+          renderTimeline(app.timeline);
+          notify("分支时间线已重组");
+        });
+        dom.historyToggle.addEventListener("click", function () { togglePanel("history-panel"); });
+        dom.trendsToggle.addEventListener("click", function () { togglePanel("trends-panel"); });
+        document.querySelectorAll(".close-panel").forEach(function (button) {
+          button.addEventListener("click", function () { togglePanel(button.dataset.panel, false); });
+        });
+        document.querySelectorAll("[data-timeline-layout]").forEach(function (button) {
+          button.addEventListener("click", function () { setTimelineLayout(button.dataset.timelineLayout); });
+        });
+        dom.ideas.addEventListener("click", function (event) {
+          var card = event.target.closest("[data-idea-index]");
+          if (!card || !event.target.closest("button")) return;
+          var idea = app.ideas[Number(card.dataset.ideaIndex)];
+          if (!idea) return;
+          dom.seedIdea.value = [dom.seedIdea.value.trim(), idea.text].filter(Boolean).join("\n");
+          saveDraft();
+          notify("已加入已有想法");
+        });
+        dom.historyList.addEventListener("click", function (event) {
+          var item = event.target.closest("[data-history-id]");
+          if (item && event.target.closest("button")) loadHistory(item.dataset.historyId);
+        });
+        dom.historySearch.addEventListener("input", renderHistory);
+        dom.clearHistory.addEventListener("click", function () {
+          writeJSON(storageKeys.history, []);
+          renderHistory();
+          renderTrends();
+          notify("历史记录已清空");
+        });
+        [dom.keywords, dom.genre, dom.intensity, dom.hero, dom.focus, dom.seedIdea].forEach(function (field) {
+          field.addEventListener("input", saveDraft);
+          field.addEventListener("change", saveDraft);
+        });
+        dom.timeline.addEventListener("scroll", scheduleTimelineFlow);
+        window.addEventListener("resize", scheduleTimelineFlow);
+        document.addEventListener("keydown", function (event) {
+          if (event.key === "Escape") {
+            togglePanel("history-panel", false);
+            togglePanel("trends-panel", false);
+          }
+        });
+      }
+
+      function init() {
+        cacheDom();
+        loadInspirationPool();
+        renderInspirationBubbles();
+        restoreDraft();
+        bindEvents();
+        renderTimeline(null);
+        renderHistory();
+        renderTrends();
+        scheduleTimelineFlow();
+      }
+
+      document.addEventListener("DOMContentLoaded", init);
+    }());
+  </script>
+</body>
+</html>
